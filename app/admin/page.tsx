@@ -1,6 +1,6 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import AdminShell from "@/components/admin/AdminShell";
+import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import {
   FileText,
   Image as ImageIcon,
@@ -57,12 +57,24 @@ const editorSections = [
   },
 ];
 
-export default async function AdminDashboard() {
+export default async function AdminDashboard({
+  searchParams,
+}: {
+  searchParams?: Promise<{ from?: string }>;
+}) {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login");
+
+  // Not signed in? Render the login form right here at /admin instead of
+  // bouncing to a separate /admin/login URL. After login, send the user back
+  // to wherever middleware redirected them from (if they were trying to hit
+  // a deeper /admin/* route).
+  if (!user) {
+    const from = (await searchParams)?.from;
+    return <AdminLoginForm from={from} />;
+  }
 
   return (
     <AdminShell user={{ email: user.email ?? "" }}>

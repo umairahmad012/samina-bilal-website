@@ -44,20 +44,24 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAdmin = path.startsWith("/admin");
-  const isAdminLogin = path === "/admin/login";
+  const isAdminRoot = path === "/admin"; // root renders login OR dashboard
+  const isAdminLogin = path === "/admin/login"; // legacy route → redirects to /admin
   const isAdminSignup = path === "/admin/signup";
-  const isAdminPublic = isAdminLogin || isAdminSignup;
+  const isAdminPublic = isAdminRoot || isAdminLogin || isAdminSignup;
 
-  // Block access to admin without auth (except the login + signup pages)
+  // Block access to deeper /admin/* routes without auth — bounce to /admin
+  // (which renders the login form). /admin itself, /admin/login, and
+  // /admin/signup are always reachable.
   if (isAdmin && !isAdminPublic && !user) {
     const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
+    url.pathname = "/admin";
     url.searchParams.set("from", path);
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from login + signup
-  if (isAdminPublic && user) {
+  // Redirect authenticated users away from /admin/signup (they already have
+  // an account) and from the legacy /admin/login URL.
+  if ((isAdminLogin || isAdminSignup) && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.searchParams.delete("from");
