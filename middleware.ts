@@ -47,11 +47,17 @@ export async function middleware(request: NextRequest) {
   const isAdminRoot = path === "/admin"; // root renders login OR dashboard
   const isAdminLogin = path === "/admin/login"; // legacy route → redirects to /admin
   const isAdminSignup = path === "/admin/signup";
-  const isAdminPublic = isAdminRoot || isAdminLogin || isAdminSignup;
+  const isAdminForgot = path === "/admin/forgot-password";
+  const isAdminReset = path === "/admin/reset-password";
+  const isAdminPublic =
+    isAdminRoot ||
+    isAdminLogin ||
+    isAdminSignup ||
+    isAdminForgot ||
+    isAdminReset;
 
   // Block access to deeper /admin/* routes without auth — bounce to /admin
-  // (which renders the login form). /admin itself, /admin/login, and
-  // /admin/signup are always reachable.
+  // (which renders the login form). Public routes are always reachable.
   if (isAdmin && !isAdminPublic && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
@@ -59,9 +65,11 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Redirect authenticated users away from /admin/signup (they already have
-  // an account) and from the legacy /admin/login URL.
-  if ((isAdminLogin || isAdminSignup) && user) {
+  // Redirect authenticated users away from login-adjacent pages they don't
+  // need anymore (signup, login, forgot). Reset stays accessible to authed
+  // users so they can change their password if they wanted to follow a fresh
+  // recovery link.
+  if ((isAdminLogin || isAdminSignup || isAdminForgot) && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin";
     url.searchParams.delete("from");

@@ -91,17 +91,16 @@ export default function AdminLoginForm({ from }: { from?: string }) {
           >
             {loading ? "Signing in…" : "Sign In"}
           </button>
-        </form>
 
-        <p className="text-xs text-ink/50 mt-8 text-center">
-          New here?{" "}
-          <Link
-            href="/admin/signup"
-            className="text-navy underline underline-offset-2 hover:no-underline"
-          >
-            Create the first admin account
-          </Link>
-        </p>
+          <p className="text-xs text-ink/55 text-center">
+            <Link
+              href="/admin/forgot-password"
+              className="hover:text-navy underline underline-offset-2"
+            >
+              Forgot password?
+            </Link>
+          </p>
+        </form>
       </div>
     </div>
   );
