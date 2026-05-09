@@ -5,6 +5,7 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { content } from "./content";
+import { cldUrl } from "./cloudinary";
 
 let cached: SupabaseClient | null = null;
 function client(): SupabaseClient | null {
@@ -29,6 +30,10 @@ export type PartnerContact = {
   company: string;
   phone: string;
   email: string;
+  /** Square headshot URL (empty string if none) */
+  photo?: string;
+  /** Logo URL — usually a transparent PNG (empty string if none) */
+  logo?: string;
 };
 
 export type PartnerCategory = {
@@ -53,6 +58,10 @@ type PartnerRow = {
   phone: string | null;
   email: string | null;
   display_order: number;
+  photo_id?: string | null;
+  logo_id?: string | null;
+  photo_media?: { cloudinary_public_id: string | null; url: string } | null;
+  logo_media?: { cloudinary_public_id: string | null; url: string } | null;
 };
 
 export async function getPartnerCategories(): Promise<PartnerCategory[]> {
@@ -69,7 +78,10 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
       supabase
         .from("partners")
         .select(
-          "id, category_id, name, role, company, phone, email, display_order",
+          `id, category_id, name, role, company, phone, email, display_order,
+           photo_id, logo_id,
+           photo_media:photo_id ( cloudinary_public_id, url ),
+           logo_media:logo_id ( cloudinary_public_id, url )`,
         )
         .eq("is_visible", true)
         .order("display_order", { ascending: true }),
@@ -78,7 +90,7 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
     if (!cats || cats.length === 0) return content.partners.categories;
 
     const byCategory = new Map<string, PartnerRow[]>();
-    for (const p of (partners ?? []) as PartnerRow[]) {
+    for (const p of (partners ?? []) as unknown as PartnerRow[]) {
       if (!p.category_id) continue;
       const arr = byCategory.get(p.category_id) ?? [];
       arr.push(p);
@@ -88,13 +100,26 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
     return (cats as CatRow[]).map((cat) => ({
       title: cat.title,
       body: cat.description ?? "",
-      contacts: (byCategory.get(cat.id) ?? []).map((p) => ({
-        name: p.name,
-        role: p.role ?? "",
-        company: p.company ?? "",
-        phone: p.phone ?? "",
-        email: p.email ?? "",
-      })),
+      contacts: (byCategory.get(cat.id) ?? []).map((p) => {
+        const photoUrl = p.photo_media?.cloudinary_public_id
+          ? cldUrl(p.photo_media.cloudinary_public_id, {
+              crop: "square",
+              width: 320,
+            })
+          : (p.photo_media?.url ?? "");
+        const logoUrl = p.logo_media?.cloudinary_public_id
+          ? cldUrl(p.logo_media.cloudinary_public_id, { width: 240 })
+          : (p.logo_media?.url ?? "");
+        return {
+          name: p.name,
+          role: p.role ?? "",
+          company: p.company ?? "",
+          phone: p.phone ?? "",
+          email: p.email ?? "",
+          photo: photoUrl || undefined,
+          logo: logoUrl || undefined,
+        };
+      }),
     }));
   } catch {
     return content.partners.categories;

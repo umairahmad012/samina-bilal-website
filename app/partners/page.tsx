@@ -157,7 +157,25 @@ export default async function PartnersPage() {
                     key={p.name + p.role}
                     className="glass-light glow-on-hover p-7 md:p-9 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 items-center"
                   >
-                    <div className="md:col-span-5">
+                    {/* Headshot — circular avatar; gracefully shrinks the
+                         column when no photo is set */}
+                    <div
+                      className={`${p.photo ? "md:col-span-2" : "hidden"} flex justify-center md:justify-start`}
+                    >
+                      {p.photo && (
+                        <div className="relative w-20 h-20 md:w-[72px] md:h-[72px] rounded-full overflow-hidden ring-1 ring-navy/15 bg-cream-soft shrink-0">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={p.photo}
+                            alt={p.name}
+                            className="absolute inset-0 w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Name + role */}
+                    <div className={p.photo ? "md:col-span-3" : "md:col-span-5"}>
                       <p
                         className="text-base md:text-lg text-ink mb-1"
                         style={{ fontWeight: 400, letterSpacing: "0.02em" }}
@@ -168,9 +186,25 @@ export default async function PartnersPage() {
                         {p.role}
                       </p>
                     </div>
+
+                    {/* Company + logo */}
                     <div className="md:col-span-3">
-                      <p className="text-sm font-light text-ink/75">{p.company}</p>
+                      <div className="flex items-center gap-2.5">
+                        {p.logo && (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={p.logo}
+                            alt={`${p.company} logo`}
+                            className="h-7 md:h-8 w-auto max-w-[80px] object-contain shrink-0"
+                          />
+                        )}
+                        <p className="text-sm font-light text-ink/75">
+                          {p.company}
+                        </p>
+                      </div>
                     </div>
+
+                    {/* Phone + email */}
                     <div className="md:col-span-4 flex flex-col md:items-end gap-2">
                       <a
                         href={`tel:${p.phone.replace(/[^0-9+]/g, "")}`}

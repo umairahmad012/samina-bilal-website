@@ -10,7 +10,6 @@ import {
   Pencil,
   X,
   Save,
-  Sparkles,
   Eye,
   EyeOff,
 } from "lucide-react";
@@ -22,9 +21,12 @@ import {
   createPartner,
   updatePartner,
   deletePartner,
-  seedDefaultPartners,
   type PartnerFormInput,
 } from "@/app/admin/partners/actions";
+import ImagePicker, {
+  type LibraryItem,
+} from "@/components/admin/media/ImagePicker";
+import { cldUrl } from "@/lib/cloudinary";
 
 export type CategoryRow = {
   id: string;
@@ -44,21 +46,24 @@ export type PartnerRow = {
   email: string | null;
   display_order: number;
   is_visible: boolean;
+  photo_id: string | null;
+  logo_id: string | null;
 };
 
 export default function PartnersManager({
   categories,
   partners,
+  library,
 }: {
   categories: CategoryRow[];
   partners: PartnerRow[];
+  library: LibraryItem[];
 }) {
   const router = useRouter();
   const [cats, setCats] = useState<CategoryRow[]>(categories);
   const [, startTransition] = useTransition();
   const [editingCat, setEditingCat] = useState<CategoryRow | null>(null);
   const [addingCat, setAddingCat] = useState(false);
-  const [seedError, setSeedError] = useState<string | null>(null);
 
   const partnersByCategory = new Map<string, PartnerRow[]>();
   for (const p of partners) {
@@ -80,18 +85,6 @@ export default function PartnersManager({
     });
   }
 
-  function handleSeed() {
-    setSeedError(null);
-    startTransition(async () => {
-      const res = await seedDefaultPartners();
-      if (!res.ok) {
-        setSeedError(res.error);
-        return;
-      }
-      router.refresh();
-    });
-  }
-
   function handleDeleteCategory(id: string) {
     if (
       !confirm(
@@ -106,44 +99,6 @@ export default function PartnersManager({
     });
   }
 
-  if (cats.length === 0) {
-    return (
-      <div className="admin-card p-10 text-center space-y-4">
-        <p className="text-sm text-ink/65">
-          No partner categories yet. Seed the default 5 (Lenders, Inspectors,
-          Insurance, Repairs &amp; Renovations, Settlement) to start editing,
-          or add your own from scratch.
-        </p>
-        <div className="flex items-center justify-center gap-2">
-          <button
-            type="button"
-            onClick={handleSeed}
-            className="admin-btn admin-btn-secondary inline-flex"
-          >
-            <Sparkles size={14} className="mr-2" /> Seed defaults
-          </button>
-          <button
-            type="button"
-            onClick={() => setAddingCat(true)}
-            className="admin-btn"
-          >
-            <Plus size={14} className="mr-2" /> New category
-          </button>
-        </div>
-        {seedError && <p className="text-xs text-red-700">{seedError}</p>}
-        {addingCat && (
-          <CategoryDialog
-            onClose={() => setAddingCat(false)}
-            onSaved={() => {
-              setAddingCat(false);
-              router.refresh();
-            }}
-          />
-        )}
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
@@ -156,11 +111,18 @@ export default function PartnersManager({
         </button>
       </div>
 
+      {cats.length === 0 && (
+        <div className="admin-card p-10 text-center text-sm text-ink/65">
+          No categories yet — click <strong>New category</strong> to add one.
+        </div>
+      )}
+
       {cats.map((cat, i) => (
         <CategoryBlock
           key={cat.id}
           category={cat}
           partners={partnersByCategory.get(cat.id) ?? []}
+          library={library}
           isFirst={i === 0}
           isLast={i === cats.length - 1}
           onMoveUp={() => moveCategory(i, -1)}
@@ -194,6 +156,7 @@ export default function PartnersManager({
 function CategoryBlock({
   category,
   partners,
+  library,
   isFirst,
   isLast,
   onMoveUp,
@@ -203,6 +166,7 @@ function CategoryBlock({
 }: {
   category: CategoryRow;
   partners: PartnerRow[];
+  library: LibraryItem[];
   isFirst: boolean;
   isLast: boolean;
   onMoveUp: () => void;
@@ -286,46 +250,76 @@ function CategoryBlock({
         {partners.length === 0 ? (
           <p className="text-xs text-ink/45 italic px-2">No partners yet.</p>
         ) : (
-          partners.map((p) => (
-            <div
-              key={p.id}
-              className="border border-black/8 rounded-md p-3 bg-white grid grid-cols-1 md:grid-cols-12 gap-2 items-center"
-            >
-              <div className="md:col-span-3">
-                <p className="text-sm" style={{ fontWeight: 500 }}>
-                  {p.name}
-                </p>
-                {p.role && (
-                  <p className="text-[11px] text-ink/55">{p.role}</p>
-                )}
+          partners.map((p) => {
+            const photo = library.find((m) => m.id === p.photo_id);
+            const logo = library.find((m) => m.id === p.logo_id);
+            const photoSrc = photo?.cloudinary_public_id
+              ? cldUrl(photo.cloudinary_public_id, { crop: "square", width: 80 })
+              : photo?.url;
+            const logoSrc = logo?.cloudinary_public_id
+              ? cldUrl(logo.cloudinary_public_id, { width: 80 })
+              : logo?.url;
+            return (
+              <div
+                key={p.id}
+                className="border border-black/8 rounded-md p-3 bg-white grid grid-cols-1 md:grid-cols-12 gap-2 items-center"
+              >
+                <div className="md:col-span-1 flex items-center">
+                  <div className="w-9 h-9 rounded-full overflow-hidden bg-cream-soft ring-1 ring-black/8 shrink-0">
+                    {photoSrc && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={photoSrc}
+                        alt={p.name}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+                <div className="md:col-span-3">
+                  <p className="text-sm" style={{ fontWeight: 500 }}>
+                    {p.name}
+                  </p>
+                  {p.role && (
+                    <p className="text-[11px] text-ink/55">{p.role}</p>
+                  )}
+                </div>
+                <div className="md:col-span-3 text-xs text-ink/70 truncate flex items-center gap-2">
+                  {logoSrc && (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={logoSrc}
+                      alt={`${p.company} logo`}
+                      className="h-5 w-auto max-w-[40px] object-contain shrink-0"
+                    />
+                  )}
+                  <span className="truncate">{p.company}</span>
+                </div>
+                <div className="md:col-span-2 text-xs text-ink/70 truncate">
+                  {p.phone}
+                </div>
+                <div className="md:col-span-2 text-xs text-ink/70 truncate">
+                  {p.email}
+                </div>
+                <div className="md:col-span-1 flex items-center justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditing(p)}
+                    className="text-ink/55 hover:text-navy"
+                  >
+                    <Pencil size={13} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePartner(p.id)}
+                    className="text-ink/55 hover:text-red-600"
+                  >
+                    <Trash2 size={13} />
+                  </button>
+                </div>
               </div>
-              <div className="md:col-span-3 text-xs text-ink/70 truncate">
-                {p.company}
-              </div>
-              <div className="md:col-span-2 text-xs text-ink/70 truncate">
-                {p.phone}
-              </div>
-              <div className="md:col-span-3 text-xs text-ink/70 truncate">
-                {p.email}
-              </div>
-              <div className="md:col-span-1 flex items-center justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setEditing(p)}
-                  className="text-ink/55 hover:text-navy"
-                >
-                  <Pencil size={13} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDeletePartner(p.id)}
-                  className="text-ink/55 hover:text-red-600"
-                >
-                  <Trash2 size={13} />
-                </button>
-              </div>
-            </div>
-          ))
+            );
+          })
         )}
         <button
           type="button"
@@ -340,6 +334,7 @@ function CategoryBlock({
         <PartnerDialog
           categoryId={category.id}
           existing={editing ?? undefined}
+          library={library}
           onClose={() => {
             setAdding(false);
             setEditing(null);
@@ -433,11 +428,13 @@ function CategoryDialog({
 function PartnerDialog({
   categoryId,
   existing,
+  library,
   onClose,
   onSaved,
 }: {
   categoryId: string;
   existing?: PartnerRow;
+  library: LibraryItem[];
   onClose: () => void;
   onSaved: () => void;
 }) {
@@ -449,6 +446,8 @@ function PartnerDialog({
     phone: existing?.phone ?? "",
     email: existing?.email ?? "",
     is_visible: existing?.is_visible ?? true,
+    photo_id: existing?.photo_id ?? null,
+    logo_id: existing?.logo_id ?? null,
   });
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -517,6 +516,27 @@ function PartnerDialog({
             />
           </div>
         </div>
+
+        {/* Photo + logo pickers */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <ImagePicker
+            label="Headshot Photo"
+            crop="square"
+            value={v.photo_id}
+            onChange={(id) => set("photo_id", id)}
+            library={library}
+            emptyText="No photo. Optional — shown as a circular avatar on the partners page."
+          />
+          <ImagePicker
+            label="Company Logo"
+            crop="free"
+            value={v.logo_id}
+            onChange={(id) => set("logo_id", id)}
+            library={library}
+            emptyText="No logo. Optional — shown next to the company name."
+          />
+        </div>
+
         <label className="inline-flex items-center gap-2">
           <input
             type="checkbox"
@@ -546,7 +566,7 @@ function Modal({
       className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-6 overflow-y-auto"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
-      <div className="bg-white rounded-md max-w-lg w-full max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-md max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="px-5 py-4 border-b border-black/10 flex items-center justify-between sticky top-0 bg-white z-10">
           <h3 className="text-sm" style={{ fontWeight: 500 }}>
             {title}

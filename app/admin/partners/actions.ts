@@ -108,6 +108,8 @@ export type PartnerFormInput = {
   phone: string;
   email: string;
   is_visible: boolean;
+  photo_id: string | null;
+  logo_id: string | null;
 };
 
 export async function createPartner(input: PartnerFormInput): Promise<Result> {
