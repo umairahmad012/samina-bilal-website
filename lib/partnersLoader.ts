@@ -6,6 +6,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { content } from "./content";
 import { cldUrl } from "./cloudinary";
+import {
+  DEFAULT_PARTNER_PHOTO,
+  DEFAULT_PARTNER_LOGO,
+} from "./imageDefaults";
 
 function asCropArea(
   v: unknown,
@@ -125,21 +129,21 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
               width: 320,
               cropArea: asCropArea(p.photo_crop),
             })
-          : (p.photo_media?.url ?? "");
+          : (p.photo_media?.url || DEFAULT_PARTNER_PHOTO);
         const logoUrl = p.logo_media?.cloudinary_public_id
           ? cldUrl(p.logo_media.cloudinary_public_id, {
               width: 240,
               cropArea: asCropArea(p.logo_crop),
             })
-          : (p.logo_media?.url ?? "");
+          : (p.logo_media?.url || DEFAULT_PARTNER_LOGO);
         return {
           name: p.name,
           role: p.role ?? "",
           company: p.company ?? "",
           phone: p.phone ?? "",
           email: p.email ?? "",
-          photo: photoUrl || undefined,
-          logo: logoUrl || undefined,
+          photo: photoUrl,
+          logo: logoUrl,
         };
       }),
     }));

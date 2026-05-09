@@ -9,6 +9,10 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { communities as staticCommunities, type Community } from "./communities";
 import { cldUrl } from "./cloudinary";
+import {
+  DEFAULT_COMMUNITY_PHOTO,
+  DEFAULT_COMMUNITY_HERO_PHOTO,
+} from "./imageDefaults";
 
 function asCropArea(
   v: unknown,
@@ -118,7 +122,8 @@ function rowToCommunity(row: DbRow, fallback?: Community): Community {
     priceTiers,
     life: lifeObj,
     saminaQuote: row.samina_quote ?? fallback?.saminaQuote ?? "",
-    image: imageFromDb ?? fallback?.image ?? "",
+    // Always render *something* — picked photo → static slug fallback → generic stock
+    image: imageFromDb ?? fallback?.image ?? DEFAULT_COMMUNITY_PHOTO,
     heroImage: heroImageFromDb ?? undefined,
   };
 }

@@ -22,6 +22,7 @@ import {
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
 import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
+import { DEFAULT_CLOSING_PHOTO } from "@/lib/imageDefaults";
 
 export type ClosingRow = {
   id: string;
@@ -103,7 +104,7 @@ export default function ClosingsManager({
                     crop: "landscape",
                     width: 720,
                   })
-                : c.media?.url ?? null;
+                : (c.media?.url || DEFAULT_CLOSING_PHOTO);
               return (
                 <div
                   key={c.id}
@@ -261,6 +262,7 @@ function ClosingDialog({
             cropArea={v.image_crop ?? null}
             onCropAreaChange={(c) => set("image_crop", c)}
             library={library}
+            fallbackUrl={DEFAULT_CLOSING_PHOTO}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

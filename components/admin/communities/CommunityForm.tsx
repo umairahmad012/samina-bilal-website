@@ -10,6 +10,10 @@ import {
   type CommunityInput,
 } from "@/app/admin/communities/actions";
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
+import {
+  DEFAULT_COMMUNITY_PHOTO,
+  DEFAULT_COMMUNITY_HERO_PHOTO,
+} from "@/lib/imageDefaults";
 
 export default function CommunityForm({
   existingId,
@@ -173,6 +177,7 @@ export default function CommunityForm({
             onCropAreaChange={(c) => set("image_crop", c)}
             library={library}
             emptyText="No photo selected — upload or pick from library."
+            fallbackUrl={DEFAULT_COMMUNITY_PHOTO}
           />
           <div className="pt-6 border-t border-black/8">
             <ImagePicker
@@ -184,6 +189,7 @@ export default function CommunityForm({
               onCropAreaChange={(c) => set("hero_image_crop", c)}
               library={library}
               emptyText="Leave blank to reuse the Community Photo above. Pick a different shot here if you want a wider/different hero on the community detail page."
+              fallbackUrl={DEFAULT_COMMUNITY_HERO_PHOTO}
             />
           </div>
         </div>

@@ -28,6 +28,10 @@ import ImagePicker, {
 } from "@/components/admin/media/ImagePicker";
 import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
+import {
+  DEFAULT_PARTNER_PHOTO,
+  DEFAULT_PARTNER_LOGO,
+} from "@/lib/imageDefaults";
 
 export type CategoryRow = {
   id: string;
@@ -532,7 +536,8 @@ function PartnerDialog({
             cropArea={v.photo_crop ?? null}
             onCropAreaChange={(c) => set("photo_crop", c)}
             library={library}
-            emptyText="No photo. Optional — shown as a circular avatar on the partners page."
+            emptyText="Default headshot shown until you pick or upload."
+            fallbackUrl={DEFAULT_PARTNER_PHOTO}
           />
           <ImagePicker
             label="Company Logo"
@@ -542,7 +547,8 @@ function PartnerDialog({
             cropArea={v.logo_crop ?? null}
             onCropAreaChange={(c) => set("logo_crop", c)}
             library={library}
-            emptyText="No logo. Optional — shown next to the company name."
+            emptyText="Default logo placeholder shown until you pick or upload."
+            fallbackUrl={DEFAULT_PARTNER_LOGO}
           />
         </div>
 

@@ -6,6 +6,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { closings as staticClosings, type Closing } from "./closings";
 import { cldUrl } from "./cloudinary";
+import { DEFAULT_CLOSING_PHOTO } from "./imageDefaults";
 
 function asCropArea(
   v: unknown,
@@ -75,7 +76,7 @@ export async function getClosings(): Promise<Closing[]> {
             width: 1200,
             cropArea: asCropArea(r.image_crop),
           })
-        : r.media?.url ?? "",
+        : (r.media?.url || DEFAULT_CLOSING_PHOTO),
       neighborhood: r.neighborhood ?? "",
       city: r.city ?? "",
       state: r.state ?? "VA",
