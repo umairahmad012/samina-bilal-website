@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, Search } from "lucide-react";
+import { Menu } from "lucide-react";
 import Logo from "./Logo";
 import MenuDrawer from "./MenuDrawer";
 
@@ -41,15 +41,6 @@ export default function Header({
           <Logo variant={scrolled ? "dark" : "light"} portraitAvatar={portraitAvatar} />
 
           <div className="flex items-center gap-3 md:gap-6">
-            <button
-              aria-label="Search"
-              className={`p-2 transition-colors ${
-                scrolled ? "text-ink hover:text-navy" : "text-white hover:text-white/70"
-              }`}
-            >
-              <Search size={20} strokeWidth={1.5} />
-            </button>
-
             <Link
               href="/contact"
               className={`hidden md:inline-flex items-center px-6 py-3 border text-xs tracking-[0.25em] uppercase font-light transition-all duration-400 ease-editorial ${
