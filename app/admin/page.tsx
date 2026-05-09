@@ -9,6 +9,7 @@ import {
   Users,
   Briefcase,
   UsersRound,
+  DoorOpen,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -36,6 +37,13 @@ const editorSections = [
     icon: Briefcase,
     title: "Recent Closings",
     description: "Add and manage closed-sale entries.",
+  },
+  {
+    href: "/admin/open-houses",
+    icon: DoorOpen,
+    title: "Open Houses",
+    description:
+      "Build a landing page + printable A4 flyer for each open house. Auto-generates an RSVP form.",
   },
   {
     href: "/admin/reviews",

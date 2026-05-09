@@ -16,8 +16,15 @@ export default function Header({
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
-  // Hide marketing header inside the admin panel
-  if (pathname?.startsWith("/admin")) return null;
+  // Hide marketing header inside the admin panel + on standalone pages
+  // (open-house flyer pages render without nav/footer for a clean print)
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/open-house") ||
+    pathname?.startsWith("/leave-review") ||
+    pathname?.startsWith("/form/")
+  )
+    return null;
 
   useEffect(() => {
     function onScroll() {

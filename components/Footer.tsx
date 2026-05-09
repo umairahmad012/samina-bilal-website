@@ -14,8 +14,14 @@ export default function Footer({
   const bo = site.brokerageOffice;
   const avatar = portraitAvatar || site.portrait.avatar;
 
-  // Hide marketing footer inside the admin panel
-  if (pathname?.startsWith("/admin")) return null;
+  // Hide marketing footer inside the admin panel + on standalone pages
+  if (
+    pathname?.startsWith("/admin") ||
+    pathname?.startsWith("/open-house") ||
+    pathname?.startsWith("/leave-review") ||
+    pathname?.startsWith("/form/")
+  )
+    return null;
 
   return (
     <footer className="bg-navy text-white pt-20 md:pt-24 pb-8">
