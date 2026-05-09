@@ -107,8 +107,9 @@ export default function CropEditor({
       className="fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-6"
       onClick={(e) => e.target === e.currentTarget && onCancel()}
     >
-      <div className="bg-white rounded-md w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden">
-        <div className="px-5 py-4 border-b border-black/10 flex items-center justify-between">
+      <div className="bg-white rounded-md w-full max-w-3xl max-h-[95vh] flex flex-col">
+        {/* Header — fixed at top, never shrinks */}
+        <div className="flex-shrink-0 px-5 py-4 border-b border-black/10 flex items-center justify-between bg-white rounded-t-md">
           <h3 className="text-sm" style={{ fontWeight: 500 }}>
             Adjust crop
           </h3>
@@ -121,24 +122,27 @@ export default function CropEditor({
           </button>
         </div>
 
-        {/* Cropper canvas */}
-        <div className="relative bg-black/90 h-[55vh] min-h-[400px]">
-          <Cropper
-            image={imageSrc}
-            crop={crop}
-            zoom={zoom}
-            aspect={aspect}
-            onCropChange={setCrop}
-            onZoomChange={setZoom}
-            onCropComplete={onCropComplete}
-            initialCroppedAreaPercentages={initialCroppedAreaPercentages}
-            objectFit="contain"
-            showGrid
-          />
-        </div>
+        {/* Scrollable middle: cropper canvas + controls. Shrinks first when
+             viewport gets short so the footer always stays visible. */}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {/* Cropper canvas */}
+          <div className="relative bg-black/90 h-[45vh] min-h-[280px]">
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={aspect}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+              initialCroppedAreaPercentages={initialCroppedAreaPercentages}
+              objectFit="contain"
+              showGrid
+            />
+          </div>
 
-        {/* Controls */}
-        <div className="p-5 space-y-4 border-t border-black/8 bg-white">
+          {/* Controls */}
+          <div className="p-5 space-y-4 border-t border-black/8 bg-white">
           {/* Aspect ratio chips */}
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-[11px] uppercase tracking-[0.18em] text-ink/55 mr-2">
@@ -186,10 +190,12 @@ export default function CropEditor({
             Drag the photo to reposition. Use the slider to zoom in or out.
             Original photo is never modified — you can re-crop or reset later.
           </p>
+          </div>
         </div>
+        {/* end of scrollable middle */}
 
-        {/* Footer actions */}
-        <div className="px-5 py-4 border-t border-black/10 flex items-center justify-between bg-white">
+        {/* Footer actions — fixed at bottom, never shrinks, always tappable */}
+        <div className="flex-shrink-0 px-5 py-4 border-t border-black/10 flex items-center justify-between bg-white rounded-b-md flex-wrap gap-2">
           <button
             type="button"
             onClick={reset}
