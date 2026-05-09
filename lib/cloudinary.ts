@@ -97,7 +97,13 @@ export function cldUrl(publicId: string, opts: CldOptions = {}): string {
   }
   if (opts.width) finalSegment.push(`w_${opts.width}`);
   if (opts.height) finalSegment.push(`h_${opts.height}`);
-  finalSegment.push("q_auto");
+  // q_auto:best  — Cloudinary's highest auto-quality preset (still much smaller
+  //                than original; visibly sharper than default q_auto)
+  // dpr_auto     — serve 2× / 3× variants automatically to retina screens
+  //                (no oversize on 1× displays). Modern browsers send the
+  //                Sec-CH-DPR client hint; for older browsers Cloudinary
+  //                falls back to 1× which is fine.
+  finalSegment.push("q_auto:best", "dpr_auto");
   segments.push(finalSegment);
 
   const transform = segments.map((s) => s.join(",")).join("/");
