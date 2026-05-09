@@ -1,0 +1,172 @@
+/**
+ * Cloudinary URL builder + upload helpers.
+ *
+ * We don't pull in the cloudinary SDK on the client — image transformations
+ * are pure URL composition. This keeps the bundle thin and the API keys
+ * server-side only (the API key/secret are never used for reads).
+ *
+ * Transform vocabulary (just what we need):
+ *   - crop variants: 1:1 (square), 3:4 (portrait), 4:3 (landscape), 16:9 (wide)
+ *   - background removal (Cloudinary AI add-on)
+ *   - max-width sizing for responsive delivery
+ *   - quality auto, format auto
+ */
+
+const CLOUD_NAME = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ?? "";
+export const UPLOAD_PRESET = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET ?? "";
+
+export type CropPreset = "square" | "portrait" | "landscape" | "wide" | "free";
+
+const ASPECT_FOR: Record<CropPreset, string | null> = {
+  square: "1:1",
+  portrait: "3:4",
+  landscape: "4:3",
+  wide: "16:9",
+  free: null,
+};
+
+export type CldOptions = {
+  /** Force an aspect-ratio crop (auto-gravity selects best subject) */
+  crop?: CropPreset;
+  /** Apply Cloudinary AI background removal. Returns transparent PNG. */
+  removeBackground?: boolean;
+  /** Max delivered width in pixels (DPR is layered on top automatically). */
+  width?: number;
+  /** Max delivered height in pixels. */
+  height?: number;
+  /** Override the gravity used by aspect-ratio crops. Default 'auto'. */
+  gravity?: "auto" | "face" | "faces" | "center";
+};
+
+/**
+ * Build a Cloudinary delivery URL from a public_id + options.
+ *
+ *   cldUrl("hero/woodbridge", { crop: "wide", width: 1920 })
+ *   → https://res.cloudinary.com/<cloud>/image/upload/c_fill,ar_16:9,g_auto,w_1920,q_auto,f_auto/hero/woodbridge
+ */
+export function cldUrl(publicId: string, opts: CldOptions = {}): string {
+  if (!CLOUD_NAME) return ""; // Fail soft — caller should fall back
+  if (!publicId) return "";
+
+  const parts: string[] = [];
+
+  if (opts.removeBackground) {
+    parts.push("e_background_removal");
+    // Always use PNG when removing background (transparency)
+    parts.push("f_png");
+  } else {
+    parts.push("f_auto");
+  }
+
+  if (opts.crop && opts.crop !== "free") {
+    const ar = ASPECT_FOR[opts.crop];
+    if (ar) {
+      parts.push("c_fill");
+      parts.push(`ar_${ar}`);
+      parts.push(`g_${opts.gravity ?? "auto"}`);
+    }
+  }
+
+  if (opts.width) parts.push(`w_${opts.width}`);
+  if (opts.height) parts.push(`h_${opts.height}`);
+  parts.push("q_auto");
+
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${parts.join(",")}/${publicId}`;
+}
+
+/**
+ * Are we configured to upload? Used to gate UI that depends on Cloudinary.
+ */
+export function cloudinaryConfigured(): boolean {
+  return Boolean(CLOUD_NAME && UPLOAD_PRESET);
+}
+
+/**
+ * Direct unsigned upload to Cloudinary from the browser. Returns the parsed
+ * Cloudinary response. The /admin route is auth-protected, so unsigned is
+ * acceptable here — we still recommend a tightly-scoped upload preset
+ * (folder restriction, max file size, allowed formats).
+ */
+export async function uploadToCloudinary(file: File): Promise<{
+  public_id: string;
+  secure_url: string;
+  width: number;
+  height: number;
+  format: string;
+  resource_type: string;
+}> {
+  if (!cloudinaryConfigured()) {
+    throw new Error("Cloudinary is not configured. Check .env.local.");
+  }
+
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
+
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/upload`,
+    { method: "POST", body: fd },
+  );
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Upload failed (${res.status}): ${text}`);
+  }
+  return res.json();
+}
+
+/**
+ * Extract a YouTube video ID from a URL or raw ID. Returns null if invalid.
+ *   "https://www.youtube.com/watch?v=dQw4w9WgXcQ" → "dQw4w9WgXcQ"
+ *   "https://youtu.be/dQw4w9WgXcQ" → "dQw4w9WgXcQ"
+ *   "dQw4w9WgXcQ" → "dQw4w9WgXcQ"
+ */
+export function parseYouTubeId(input: string): string | null {
+  if (!input) return null;
+  const trimmed = input.trim();
+  // 11-char ID format
+  if (/^[a-zA-Z0-9_-]{11}$/.test(trimmed)) return trimmed;
+  try {
+    const u = new URL(trimmed);
+    if (u.hostname.includes("youtu.be")) {
+      const id = u.pathname.replace(/^\//, "");
+      if (/^[a-zA-Z0-9_-]{11}$/.test(id)) return id;
+    }
+    if (u.hostname.includes("youtube.com")) {
+      const v = u.searchParams.get("v");
+      if (v && /^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+      // /embed/<id> or /shorts/<id>
+      const m = u.pathname.match(/\/(embed|shorts)\/([a-zA-Z0-9_-]{11})/);
+      if (m) return m[2];
+    }
+  } catch {
+    // not a URL — fall through
+  }
+  return null;
+}
+
+export function youTubeThumbnail(id: string): string {
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
+}
+
+export function youTubeWatchUrl(id: string): string {
+  return `https://www.youtube.com/watch?v=${id}`;
+}
+
+/**
+ * Embed URL for muted autoplay loop (the hero/background video pattern).
+ */
+export function youTubeBackgroundEmbed(id: string): string {
+  const params = new URLSearchParams({
+    autoplay: "1",
+    mute: "1",
+    loop: "1",
+    playlist: id, // required for loop=1 to work on YouTube embeds
+    controls: "0",
+    showinfo: "0",
+    rel: "0",
+    modestbranding: "1",
+    playsinline: "1",
+  });
+  return `https://www.youtube.com/embed/${id}?${params.toString()}`;
+}

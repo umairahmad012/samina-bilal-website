@@ -1,39 +1,85 @@
-export default function IntroSection() {
+import Link from "next/link";
+import Reveal from "@/components/Reveal";
+import { getSection, getPortrait } from "@/lib/contentLoader";
+
+type MeetContent = {
+  eyebrow: string;
+  heading: string;
+  body: string[];
+  quote: string;
+  cta: { label: string; href: string };
+};
+
+export default async function IntroSection() {
+  const [c, portrait] = await Promise.all([
+    getSection<MeetContent>("home", "meet"),
+    getPortrait(),
+  ]);
+
   return (
     <section
       id="intro"
       className="relative section-y-lg gutter-x overflow-hidden"
     >
-      {/* Soft full-bleed background image */}
-      <div
-        className="absolute inset-0 bg-cover bg-center opacity-[0.12]"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=1920&auto=format&fit=crop&q=85')",
-        }}
-      />
-      <div className="absolute inset-0 bg-cream/70" />
+      <div className="relative max-w-[1500px] mx-auto grid md:grid-cols-12 gap-10 md:gap-20 lg:gap-28 items-center">
+        {/* Portrait */}
+        <Reveal direction="left" className="md:col-span-5">
+          <div className="relative aspect-[3/4] overflow-hidden">
+            <div
+              className="absolute inset-0 bg-cover bg-center grayscale"
+              style={{ backgroundImage: `url('${portrait.full}')` }}
+            />
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.25) 100%)",
+              }}
+            />
+            <div className="absolute inset-0 ring-1 ring-inset ring-ink/10" />
+          </div>
+        </Reveal>
 
-      <div className="relative max-w-3xl mx-auto text-center">
-        <p className="eyebrow mb-10">Samina Bilal · Realtor</p>
-        <h2
-          className="heading-section text-ink mb-12"
-          style={{ fontSize: "clamp(1.6rem, 3vw, 2.25rem)" }}
-        >
-          A Boutique Approach to
-          <br />
-          Northern Virginia Real Estate
-        </h2>
+        {/* Text */}
+        <div className="md:col-span-7">
+          <Reveal as="p" className="eyebrow mb-8">{c.eyebrow}</Reveal>
+          <Reveal
+            as="h2"
+            delay={80}
+            className="heading-section text-ink mb-10"
+            style={{ fontSize: "clamp(1.6rem, 3vw, 2.5rem)" }}
+          >
+            {c.heading}
+          </Reveal>
+          <Reveal as="div" delay={160} className="mb-10 w-12 h-px bg-navy/40" />
 
-        <div className="mx-auto mb-12 w-12 h-px bg-oxblood/40" />
+          {c.body.map((para, i) => (
+            <Reveal
+              key={i}
+              as="p"
+              delay={240 + i * 80}
+              blur
+              className="text-base md:text-lg font-light leading-[1.95] text-ink/80 mb-8"
+            >
+              {para}
+            </Reveal>
+          ))}
 
-        <p className="text-lg md:text-xl font-light leading-[1.9] text-ink/80 max-w-2xl mx-auto">
-          Samina Bilal is a licensed Realtor with RE/MAX Galaxy, serving buyers
-          and sellers across Virginia and Maryland. From first-time buyers in
-          Woodbridge to investors in Fredericksburg and families relocating to
-          Stafford, she brings a calm, detail-driven approach to one of the
-          biggest decisions you'll ever make.
-        </p>
+          <Reveal
+            as="p"
+            delay={400}
+            blur
+            className="text-base md:text-lg font-light leading-[1.95] text-ink/75 italic mb-12"
+          >
+            "{c.quote}"
+          </Reveal>
+
+          <Reveal delay={480}>
+            <Link href={c.cta.href} className="btn-outline-dark">
+              {c.cta.label}
+            </Link>
+          </Reveal>
+        </div>
       </div>
     </section>
   );

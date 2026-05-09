@@ -8,10 +8,13 @@ import { nav, site } from "@/lib/site";
 export default function MenuDrawer({
   open,
   onClose,
+  portraitAvatar,
 }: {
   open: boolean;
   onClose: () => void;
+  portraitAvatar?: string;
 }) {
+  const avatar = portraitAvatar || site.portrait.avatar;
   useEffect(() => {
     function onEsc(e: KeyboardEvent) {
       if (e.key === "Escape") onClose();
@@ -39,7 +42,7 @@ export default function MenuDrawer({
 
       {/* Drawer */}
       <aside
-        className={`fixed top-0 right-0 z-50 h-full w-full md:w-[520px] bg-oxblood text-white shadow-2xl transition-transform duration-700 ease-editorial ${
+        className={`fixed top-0 right-0 z-50 h-full w-full md:w-[520px] bg-navy text-white shadow-2xl transition-transform duration-700 ease-editorial ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
         role="dialog"
@@ -55,14 +58,22 @@ export default function MenuDrawer({
           <X size={28} strokeWidth={1.25} />
         </button>
 
-        {/* Monogram */}
+        {/* Portrait */}
         <div className="pt-16 md:pt-20 pb-8 md:pb-12 flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full border border-white/40 flex items-center justify-center">
-            <span className="text-3xl font-thin tracking-wider" style={{ fontWeight: 200 }}>
-              S.
-            </span>
+          <div className="relative w-24 h-24 rounded-full overflow-hidden ring-1 ring-white/35">
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: `url('${avatar}')` }}
+              aria-hidden="true"
+            />
           </div>
-          <span className="mt-3 text-[0.65rem] tracking-[0.4em] uppercase opacity-80">
+          <span
+            className="mt-4 text-[0.7rem] tracking-[0.4em] uppercase text-white/85"
+            style={{ fontWeight: 300 }}
+          >
+            Samina&nbsp;Bilal
+          </span>
+          <span className="mt-1.5 text-[0.6rem] tracking-[0.4em] uppercase text-white/55">
             Realtor
           </span>
         </div>

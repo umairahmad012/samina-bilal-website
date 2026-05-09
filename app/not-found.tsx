@@ -1,8 +1,9 @@
 import Link from "next/link";
+import ShimmerText from "@/components/ShimmerText";
 
 export default function NotFound() {
   return (
-    <section className="relative min-h-screen w-full overflow-hidden bg-oxblood-dark">
+    <section className="relative min-h-screen w-full overflow-hidden bg-navy-dark">
       <div
         className="absolute inset-0 bg-cover bg-center"
         style={{
@@ -21,7 +22,7 @@ export default function NotFound() {
             lineHeight: 1.04,
           }}
         >
-          Page Not Found
+          <ShimmerText>Page Not Found</ShimmerText>
         </h1>
         <div className="mt-12 w-16 h-px bg-white/40" />
         <p className="mt-12 max-w-md text-base md:text-lg font-light text-white/90 leading-[1.95] italic">

@@ -2,13 +2,22 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, Search } from "lucide-react";
 import Logo from "./Logo";
 import MenuDrawer from "./MenuDrawer";
 
-export default function Header() {
+export default function Header({
+  portraitAvatar,
+}: {
+  portraitAvatar?: string;
+}) {
+  const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+
+  // Hide marketing header inside the admin panel
+  if (pathname?.startsWith("/admin")) return null;
 
   useEffect(() => {
     function onScroll() {
@@ -29,13 +38,13 @@ export default function Header() {
         }`}
       >
         <div className="max-w-[1600px] mx-auto px-6 md:px-12 flex items-center justify-between">
-          <Logo variant={scrolled ? "dark" : "light"} />
+          <Logo variant={scrolled ? "dark" : "light"} portraitAvatar={portraitAvatar} />
 
           <div className="flex items-center gap-3 md:gap-6">
             <button
               aria-label="Search"
               className={`p-2 transition-colors ${
-                scrolled ? "text-ink hover:text-oxblood" : "text-white hover:text-white/70"
+                scrolled ? "text-ink hover:text-navy" : "text-white hover:text-white/70"
               }`}
             >
               <Search size={20} strokeWidth={1.5} />
@@ -45,8 +54,8 @@ export default function Header() {
               href="/contact"
               className={`hidden md:inline-flex items-center px-6 py-3 border text-xs tracking-[0.25em] uppercase font-light transition-all duration-400 ease-editorial ${
                 scrolled
-                  ? "border-ink text-ink hover:bg-oxblood hover:border-oxblood hover:text-white"
-                  : "border-white/80 text-white hover:bg-white hover:text-oxblood"
+                  ? "border-ink text-ink hover:bg-navy hover:border-navy hover:text-white"
+                  : "border-white/80 text-white hover:bg-white hover:text-navy"
               }`}
             >
               Contact
@@ -56,7 +65,7 @@ export default function Header() {
               onClick={() => setOpen(true)}
               aria-label="Open menu"
               className={`p-2 transition-colors ${
-                scrolled ? "text-ink hover:text-oxblood" : "text-white hover:text-white/70"
+                scrolled ? "text-ink hover:text-navy" : "text-white hover:text-white/70"
               }`}
             >
               <Menu size={24} strokeWidth={1.5} />
@@ -65,7 +74,11 @@ export default function Header() {
         </div>
       </header>
 
-      <MenuDrawer open={open} onClose={() => setOpen(false)} />
+      <MenuDrawer
+        open={open}
+        onClose={() => setOpen(false)}
+        portraitAvatar={portraitAvatar}
+      />
     </>
   );
 }

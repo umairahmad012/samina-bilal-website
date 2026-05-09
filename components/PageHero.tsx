@@ -1,3 +1,5 @@
+import ShimmerText from "@/components/ShimmerText";
+
 export default function PageHero({
   eyebrow,
   title,
@@ -26,11 +28,11 @@ export default function PageHero({
           className="heading-display text-ink"
           style={{ fontSize: "clamp(2.5rem, 6vw, 4.5rem)", lineHeight: 1.05 }}
         >
-          {title}
+          <ShimmerText tone="light">{title}</ShimmerText>
         </h1>
         {subtitle && (
           <>
-            <div className="mx-auto mt-12 mb-12 w-12 h-px bg-oxblood/40" />
+            <div className="mx-auto mt-12 mb-12 w-12 h-px bg-navy/40" />
             <p className="max-w-2xl mx-auto text-base md:text-lg font-light text-ink/80 leading-[1.95]">
               {subtitle}
             </p>

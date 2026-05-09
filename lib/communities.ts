@@ -28,7 +28,7 @@ export const communities: Community[] = [
     dom: "42 days",
     marketType: "Balanced",
     about:
-      "Woodbridge sits at the southern edge of the Northern Virginia tech corridor — close enough to D.C. to commute, far enough to actually afford a yard. Anchored by the Potomac River, Occoquan Bay, and Stonebridge at Potomac Town Center, it's where first-time buyers, growing families, and military households all find each other. The 22192 ZIP (Lake Ridge / Old Bridge) trends slightly more expensive at $506K median, while 22191 (Belmont Bay / Marina) currently sits at $457K — both with strong townhome and SFH inventory.",
+      "Woodbridge sits at the southern edge of the Northern Virginia tech corridor — close enough to commute into the region, far enough to actually afford a yard. Anchored by the Potomac River, Occoquan Bay, and Stonebridge at Potomac Town Center, it's where first-time buyers, growing families, and military households all find each other. The 22192 ZIP (Lake Ridge / Old Bridge) trends slightly more expensive at $506K median, while 22191 (Belmont Bay / Marina) currently sits at $457K — both with strong townhome and SFH inventory.",
     market2026:
       "2026 has been steady and slightly up in Woodbridge. Prices grew 5.5% year-over-year while the rest of NoVa softened. Homes are moving in about six weeks — neither hot nor cold, which means buyers can still negotiate inspection items and sellers who price right are getting clean offers.",
     priceTiers: [
@@ -40,7 +40,7 @@ export const communities: Community[] = [
       schools: "Westridge ES, Lake Ridge MS, Woodbridge HS",
       parks: "Leesylvania State Park, Occoquan Bay NWR, Veterans Memorial Park",
       dining: "Stonebridge at Potomac Town Center, Old Town Occoquan, Potomac Mills",
-      commute: "30 min to Pentagon · 45 min to D.C. · VRE Manassas Line · I-95 + Route 1",
+      commute: "30 min to Pentagon · VRE Manassas Line · I-95 + Route 1",
     },
     saminaQuote:
       "Woodbridge is where I live and work. It's the rare NoVa zip code where a young family can still buy something they're proud of, in a community that actually feels like one.",
@@ -73,7 +73,7 @@ export const communities: Community[] = [
       commute: "VRE Quantico station · I-95 · 35 min to Pentagon · adjacent to MCB Quantico",
     },
     saminaQuote:
-      "Five years ago Dumfries was a hidden value play. Today it's the fastest-appreciating market between D.C. and Fredericksburg. If you can buy here in 2026, you'll thank yourself in 2030.",
+      "Five years ago Dumfries was a hidden value play. Today it.s the fastest-appreciating market in the southern NoVa corridor. If you can buy here in 2026, you'll thank yourself in 2030.",
     image:
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1600&auto=format&fit=crop&q=80",
   },
@@ -100,7 +100,7 @@ export const communities: Community[] = [
       schools: "Loudoun County Schools — among the highest-rated in Virginia",
       parks: "Beaverdam Reservoir, W&OD Trail, Brambleton Town Center",
       dining: "One Loudoun, Brambleton Town Center, Dulles Town Center",
-      commute: "Silver Line Metro · Dulles Toll Rd · 25 min to Tysons · 50 min to D.C.",
+      commute: "Silver Line Metro · Dulles Toll Rd · 25 min to Tysons",
     },
     saminaQuote:
       "Ashburn's softening isn't bad news — it's the window. The buyers I'm working with right now are getting concessions that didn't exist 18 months ago.",
@@ -130,7 +130,7 @@ export const communities: Community[] = [
       schools: "Fairfax County Public Schools — South County HS, Silverbrook ES",
       parks: "Mason Neck State Park, Pohick Bay Regional, Occoquan Regional Park",
       dining: "Lorton Town Center, Workhouse Arts Center, Springfield Town Center",
-      commute: "VRE Lorton station · I-95 · 35 min to Pentagon · 45 min to D.C.",
+      commute: "VRE Lorton station · I-95 · 35 min to Pentagon",
     },
     saminaQuote:
       "Lorton is where I send buyers who want the Fairfax County name without the Fairfax County sticker shock. The 19% appreciation isn't a fluke — it's the catch-up nobody saw coming.",
@@ -190,7 +190,7 @@ export const communities: Community[] = [
       schools: "Manassas City Schools — Osbourn HS · adjacent PWC Schools",
       parks: "Manassas National Battlefield, Signal Bay, Bull Run Regional Park",
       dining: "Historic Old Town Manassas, Manassas Mall, Virginia Gateway",
-      commute: "VRE Manassas Line (terminus) · I-66 · Route 28 · 45 min to D.C.",
+      commute: "VRE Manassas Line (terminus) · I-66 · Route 28",
     },
     saminaQuote:
       "Manassas is the most under-rated city in NoVa. Old Town has restaurants you'd drive to from Arlington, and you can still buy a real house with a real yard for under $600K.",

@@ -3,6 +3,7 @@ import { Montserrat } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { getPortrait } from "@/lib/contentLoader";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -23,17 +24,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Fetch the portrait once at the layout level so Header/Footer/Logo/MenuDrawer
+  // (all client components) can render the right image without each fetching.
+  const portrait = await getPortrait();
+
   return (
     <html lang="en" className={montserrat.variable}>
       <body>
-        <Header />
+        <Header portraitAvatar={portrait.avatar} />
         <main>{children}</main>
-        <Footer />
+        <Footer portraitAvatar={portrait.avatar} />
       </body>
     </html>
   );

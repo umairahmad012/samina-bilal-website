@@ -1,5 +1,7 @@
-import { reviews, ratingsLine } from "@/lib/reviews";
+import { getReviews, ratingsLine } from "@/lib/reviewsLoader";
 import Link from "next/link";
+import ShimmerText from "@/components/ShimmerText";
+import { getPageContent, resolveImageUrl } from "@/lib/contentLoader";
 
 export const metadata = {
   title: "Reviews | Samina Bilal",
@@ -7,22 +9,48 @@ export const metadata = {
     "Five-star ratings across Zillow, Google, and Realtor.com. In their own words.",
 };
 
-export default function ReviewsPage() {
+export const dynamic = "force-dynamic";
+
+type ReviewsPageContent = {
+  hero: { eyebrow: string; titleLines: string[]; subtitle: string; backgroundImage?: { image_id?: string } };
+  cta: { heading: string; body: string; primary: { label: string; href: string }; backgroundImage?: { image_id?: string } };
+};
+
+export default async function ReviewsPage() {
+  const [reviews, c] = await Promise.all([
+    getReviews(),
+    getPageContent<ReviewsPageContent>("reviews"),
+  ]);
+
+  const [heroBg, ctaBg] = await Promise.all([
+    resolveImageUrl(c.hero.backgroundImage, {
+      fallback:
+        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1920&auto=format&fit=crop&q=85",
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(c.cta.backgroundImage, {
+      fallback:
+        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85",
+      crop: "wide",
+      width: 1920,
+    }),
+  ]);
+
   return (
     <>
       {/* HERO */}
-      <section className="relative min-h-[70vh] w-full overflow-hidden bg-oxblood-dark">
+      <section className="relative min-h-[70vh] w-full overflow-hidden bg-navy-dark">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1920&auto=format&fit=crop&q=85')",
+            backgroundImage: `url('${heroBg}')`,
           }}
         />
         <div className="absolute inset-0 overlay-hero" />
 
-        <div className="relative z-10 min-h-[70vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-16">
-          <p className="eyebrow-light mb-10">What Clients Say</p>
+        <div className="relative z-10 min-h-[70vh] flex flex-col items-center justify-center text-center px-6 pt-28 md:pt-32 pb-14 md:pb-16">
+          <p className="eyebrow-light mb-10">{c.hero.eyebrow}</p>
           <h1
             className="heading-display text-white"
             style={{
@@ -30,9 +58,14 @@ export default function ReviewsPage() {
               lineHeight: 1.04,
             }}
           >
-            In Their
-            <br />
-            Words
+            <ShimmerText>
+              {c.hero.titleLines.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < c.hero.titleLines.length - 1 && <br />}
+                </span>
+              ))}
+            </ShimmerText>
           </h1>
           <div className="mt-12 w-16 h-px bg-white/40" />
 
@@ -41,7 +74,7 @@ export default function ReviewsPage() {
             {ratingsLine.map((r) => (
               <div key={r.source}>
                 <p className="text-4xl text-white mb-2" style={{ fontWeight: 200 }}>
-                  {r.value}
+                  {r.value.toFixed(1)}
                   <span className="ml-1 text-3xl">★</span>
                 </p>
                 <div className="mx-auto my-3 w-7 h-px bg-white/40" />
@@ -60,7 +93,7 @@ export default function ReviewsPage() {
         <div className="max-w-3xl mx-auto space-y-24 md:space-y-28">
           {reviews.map((r, i) => (
             <figure key={i} className="text-center">
-              <div className="text-oxblood mb-10 text-base tracking-[0.4em]">
+              <div className="text-navy mb-10 text-base tracking-[0.4em]">
                 ★ ★ ★ ★ ★
               </div>
               <blockquote
@@ -69,10 +102,10 @@ export default function ReviewsPage() {
               >
                 &ldquo;{r.quote}&rdquo;
               </blockquote>
-              <div className="mx-auto my-10 w-10 h-px bg-oxblood/40" />
+              <div className="mx-auto my-10 w-10 h-px bg-navy/40" />
               <figcaption className="text-[0.65rem] tracking-[0.32em] uppercase text-ink-muted">
                 {r.short ? `${r.short} · ` : ""}
-                <span className="text-oxblood">{r.source}</span>
+                <span className="text-navy">{r.source}</span>
               </figcaption>
             </figure>
           ))}
@@ -80,12 +113,11 @@ export default function ReviewsPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative bg-oxblood text-white section-y gutter-x overflow-hidden">
+      <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85')",
+            backgroundImage: `url('${ctaBg}')`,
           }}
         />
         <div className="relative max-w-3xl mx-auto text-center">
@@ -93,15 +125,14 @@ export default function ReviewsPage() {
             className="heading-section mb-10"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.25rem)" }}
           >
-            Be Next.
+            {c.cta.heading}
           </h2>
           <div className="mx-auto mb-10 w-12 h-px bg-white/40" />
           <p className="text-base md:text-lg font-light leading-[1.9] text-white/85 max-w-xl mx-auto mb-14">
-            Whether you're buying, selling, or planning ahead — start with a
-            30-minute conversation. No pressure. No cost.
+            {c.cta.body}
           </p>
-          <Link href="/contact" className="btn-glass">
-            Schedule a Call
+          <Link href={c.cta.primary.href} className="btn-glass">
+            {c.cta.primary.label}
           </Link>
         </div>
       </section>

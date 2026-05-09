@@ -11,11 +11,11 @@ const config: Config = {
         // Editorial cream/linen background — warmer than white
         cream: "#F2EFEA",
         "cream-soft": "#EDE9E2",
-        // Deep oxblood / burgundy accent (from Carolwood study)
-        oxblood: {
-          DEFAULT: "#3B1418",
-          dark: "#2A0E11",
-          light: "#5C1F25",
+        // Deep navy editorial accent
+        navy: {
+          DEFAULT: "#142840",
+          dark: "#0E1C30",
+          light: "#25406A",
         },
         // Body type
         ink: "rgba(0, 0, 0, 0.82)",

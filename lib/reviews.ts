@@ -31,8 +31,8 @@ export const reviews: Review[] = [
   },
 ];
 
-export const ratingsLine = [
-  { source: "Zillow", value: "5.0", count: "25 reviews" },
-  { source: "Google", value: "5.0", count: "10 reviews" },
-  { source: "Realtor.com", value: "5.0", count: "7 reviews" },
+export const ratingsLine: Array<{ source: string; value: number; count: string }> = [
+  { source: "Zillow", value: 5.0, count: "25 reviews" },
+  { source: "Google", value: 5.0, count: "10 reviews" },
+  { source: "Realtor.com", value: 5.0, count: "7 reviews" },
 ];

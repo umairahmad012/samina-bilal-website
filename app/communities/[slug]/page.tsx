@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { GraduationCap, Trees, UtensilsCrossed, Train } from "lucide-react";
-import { communities } from "@/lib/communities";
+import { getCommunities, getCommunityBySlug } from "@/lib/communitiesLoader";
+import ShimmerText from "@/components/ShimmerText";
+import DarkBreak from "@/components/DarkBreak";
 
-export async function generateStaticParams() {
-  return communities.map((c) => ({ slug: c.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const c = communities.find((x) => x.slug === slug);
+  const c = await getCommunityBySlug(slug);
   if (!c) return {};
   return {
     title: `${c.name}, ${c.state} Real Estate | Samina Bilal`,
@@ -27,8 +27,10 @@ export default async function CommunityPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const c = communities.find((x) => x.slug === slug);
+  const c = await getCommunityBySlug(slug);
   if (!c) notFound();
+  const all = await getCommunities();
+  const others = all.filter((x) => x.slug !== slug).slice(0, 3);
 
   const yoyColor =
     c.yoyDirection === "up"
@@ -37,12 +39,10 @@ export default async function CommunityPage({
       ? "text-orange-300"
       : "text-white/85";
 
-  const others = communities.filter((x) => x.slug !== slug).slice(0, 3);
-
   return (
     <>
       {/* HERO */}
-      <section className="relative min-h-[100vh] w-full overflow-hidden bg-oxblood-dark">
+      <section className="relative min-h-[100vh] w-full overflow-hidden bg-navy-dark">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: `url('${c.image}')` }}
@@ -59,7 +59,7 @@ export default async function CommunityPage({
                 lineHeight: 1.02,
               }}
             >
-              {c.name}
+              <ShimmerText>{c.name}</ShimmerText>
             </h1>
             <div className="mt-12 w-16 h-px bg-white/40" />
             <p className="mt-12 max-w-xl text-base md:text-lg font-light text-white/90 leading-[1.9] italic">
@@ -96,7 +96,7 @@ export default async function CommunityPage({
           >
             What {c.name} Is
           </h2>
-          <div className="mx-auto mb-12 w-12 h-px bg-oxblood/40" />
+          <div className="mx-auto mb-12 w-12 h-px bg-navy/40" />
           <p className="text-base md:text-lg font-light leading-[1.95] text-ink/80 text-left md:text-center">
             {c.about}
           </p>
@@ -113,16 +113,22 @@ export default async function CommunityPage({
           >
             The Year So Far
           </h2>
-          <div className="mx-auto mb-12 w-12 h-px bg-oxblood/40" />
+          <div className="mx-auto mb-12 w-12 h-px bg-navy/40" />
           <p className="text-base md:text-lg font-light leading-[1.95] text-ink/80 text-left md:text-center">
             {c.market2026}
           </p>
         </div>
       </section>
 
+      {/* Dark break — separates market read from price tiers */}
+      <DarkBreak
+        bgImage={c.image}
+        height="sm"
+      />
+
       {/* Price tiers */}
       <section className="section-y-lg gutter-x">
-        <div className="max-w-3xl mx-auto text-center mb-20 md:mb-24">
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-24">
           <p className="eyebrow mb-8">What you get for your money</p>
           <h2
             className="heading-section text-ink"
@@ -133,14 +139,14 @@ export default async function CommunityPage({
         </div>
         <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-8 md:gap-10">
           {c.priceTiers.map((p, i) => (
-            <div key={i} className="glass-light p-10 md:p-12 flex flex-col">
+            <div key={i} className="glass-light p-7 md:p-12 flex flex-col">
               <p
-                className="text-3xl text-oxblood mb-2 tracking-wide"
+                className="text-3xl text-navy mb-2 tracking-wide"
                 style={{ fontWeight: 200 }}
               >
                 {p.tier}
               </p>
-              <div className="my-6 w-10 h-px bg-oxblood/40" />
+              <div className="my-6 w-10 h-px bg-navy/40" />
               <p className="text-base font-light leading-[1.85] text-ink/80">
                 {p.description}
               </p>
@@ -151,7 +157,7 @@ export default async function CommunityPage({
 
       {/* Life here */}
       <section className="bg-cream-soft section-y-lg gutter-x">
-        <div className="max-w-3xl mx-auto text-center mb-20 md:mb-24">
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-24">
           <p className="eyebrow mb-8">Life here</p>
           <h2
             className="heading-section text-ink"
@@ -168,6 +174,12 @@ export default async function CommunityPage({
         </div>
       </section>
 
+      {/* Dark break — separates "Life here" from "Samina's take" */}
+      <DarkBreak
+        bgImage="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85"
+        height="sm"
+      />
+
       {/* Samina's take */}
       <section className="section-y-lg gutter-x">
         <div className="max-w-3xl mx-auto text-center">
@@ -178,7 +190,7 @@ export default async function CommunityPage({
           >
             &ldquo;{c.saminaQuote}&rdquo;
           </blockquote>
-          <div className="mx-auto my-12 w-10 h-px bg-oxblood/40" />
+          <div className="mx-auto my-12 w-10 h-px bg-navy/40" />
           <p className="text-[0.7rem] tracking-[0.4em] uppercase text-ink-muted">
             Samina Bilal · Realtor
           </p>
@@ -186,7 +198,7 @@ export default async function CommunityPage({
       </section>
 
       {/* CTA */}
-      <section className="relative bg-oxblood text-white section-y gutter-x overflow-hidden">
+      <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
           style={{ backgroundImage: `url('${c.image}')` }}
@@ -221,7 +233,7 @@ export default async function CommunityPage({
             <Link
               key={o.slug}
               href={`/communities/${o.slug}`}
-              className="group relative aspect-[4/3] block overflow-hidden bg-oxblood-dark"
+              className="group relative aspect-[4/3] block overflow-hidden bg-navy-dark"
             >
               <div
                 className="absolute inset-0 bg-cover bg-center transition-transform duration-[1.4s] ease-editorial group-hover:scale-[1.05]"
@@ -286,7 +298,7 @@ function Stat({
 function LifeCard({ icon, title, body }: { icon: React.ReactNode; title: string; body: string }) {
   return (
     <div>
-      <div className="text-oxblood mb-6">{icon}</div>
+      <div className="text-navy mb-6">{icon}</div>
       <p className="text-[0.65rem] tracking-[0.32em] uppercase text-ink-muted mb-5">
         {title}
       </p>

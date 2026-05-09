@@ -1,4 +1,9 @@
 import Link from "next/link";
+import ShimmerText from "@/components/ShimmerText";
+import Counter from "@/components/Counter";
+import StackedCards from "@/components/StackedCards";
+import DarkBreak from "@/components/DarkBreak";
+import { getPageContent, getSection, resolveImageUrl } from "@/lib/contentLoader";
 
 export const metadata = {
   title: "Path to Ownership | Renter to Homeowner — Samina Bilal",
@@ -6,72 +11,127 @@ export const metadata = {
     "A guided 12-to-24 month plan to take you from renting to closing. Free consultation. No pressure.",
 };
 
-const steps = [
-  {
-    n: "01",
-    title: "Discover",
-    body: "A free, confidential 30-minute consultation. We look at your income, savings, credit, and goals. You leave knowing exactly where you stand.",
-  },
-  {
-    n: "02",
-    title: "Prepare",
-    body: "A custom 6-to-18-month plan. Credit improvements, down-payment savings, lender introductions, and the right loan program for you (FHA, VA, conventional, first-time buyer grants).",
-  },
-  {
-    n: "03",
-    title: "Shop",
-    body: "When you're mortgage-ready, we hit the market. Showings on your schedule, neighborhoods that fit your life, and offers that actually win.",
-  },
-  {
-    n: "04",
-    title: "Close",
-    body: "Inspections, appraisal, negotiation, paperwork. You get the keys. You make yourself at home.",
-  },
+export const dynamic = "force-dynamic";
+
+// Step image fallbacks — if no admin-picked image exists, the live page
+// renders these Unsplash URLs. The registry's `path.stepImages` section
+// lets Samina swap each one independently.
+const stepImageFallbacks = [
+  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&auto=format&fit=crop&q=85",
+  "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=1920&auto=format&fit=crop&q=85",
+  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85",
+  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85",
 ];
 
-const faqs = [
-  {
-    q: "Will this affect my credit?",
-    a: "No — exploring the program does nothing to your credit. We don't pull anything until you're formally applying for a mortgage.",
-  },
-  {
-    q: "Do I need a minimum income?",
-    a: "There's no fixed minimum. What matters more is your debt-to-income ratio, employment stability, and savings runway. We'll review all of it together.",
-  },
-  {
-    q: "I have student loans or past credit issues.",
-    a: "Tell Samina. She works with lenders who specialize in your exact situation — including FHA, VA, USDA, and first-time buyer grant programs that exist for a reason.",
-  },
-  {
-    q: "Is this a 'rent-to-own' lease?",
-    a: "No — this is a real path to a real mortgage. No rent premium, no lease-option contract, no risk of losing your down payment money. You stay in your current rental until you're ready to buy.",
-  },
-  {
-    q: "What does it cost me?",
-    a: "Nothing. Buyer representation in real estate is paid by the seller at closing — that's how the industry works in Virginia and Maryland. The consultation, the planning, the lender intros — all free.",
-  },
-  {
-    q: "How long does it actually take?",
-    a: "It depends on where you're starting. Some people are mortgage-ready in 90 days. Most take 12-18 months. A few need a full 24. We'll know after our first conversation.",
-  },
-];
+type PathContent = {
+  hero: {
+    eyebrow: string;
+    titleLines: string[];
+    subtitle: string;
+    backgroundImage?: { image_id?: string };
+  };
+  truth: { eyebrow: string; heading: string; body: string };
+  steps: { n: string; title: string; body: string }[];
+  stats: { to: string | number; prefix?: string; suffix?: string; label: string }[];
+  forWho: { eyebrow: string; heading: string; lines: string[] };
+  faqs: { q: string; a: string }[];
+  cta: {
+    heading: string;
+    body: string;
+    primary: { label: string; href: string };
+    backgroundImage?: { image_id?: string };
+  };
+};
 
-export default function PathPage() {
+type DarkBreakContent = {
+  backgroundImage?: { image_id?: string };
+  eyebrow?: string;
+  quote?: string;
+  attribution?: string;
+};
+
+type StepImagesContent = {
+  step1?: { image_id?: string };
+  step2?: { image_id?: string };
+  step3?: { image_id?: string };
+  step4?: { image_id?: string };
+};
+
+export default async function PathPage() {
+  const [c, darkBreak, stepImagesContent] = await Promise.all([
+    getPageContent<PathContent>("path"),
+    getSection<DarkBreakContent>("path", "darkBreak"),
+    getSection<StepImagesContent>("path", "stepImages"),
+  ]);
+
+  const ctaFallbackBg =
+    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85";
+  const darkBreakFallbackBg =
+    "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85";
+
+  const [heroBg, ctaBg, darkBreakBg, ...stepImages] = await Promise.all([
+    resolveImageUrl(c.hero.backgroundImage, {
+      fallback:
+        "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85",
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(c.cta?.backgroundImage, {
+      fallback: ctaFallbackBg,
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(darkBreak?.backgroundImage, {
+      fallback: darkBreakFallbackBg,
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(stepImagesContent?.step1, {
+      fallback: stepImageFallbacks[0],
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(stepImagesContent?.step2, {
+      fallback: stepImageFallbacks[1],
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(stepImagesContent?.step3, {
+      fallback: stepImageFallbacks[2],
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(stepImagesContent?.step4, {
+      fallback: stepImageFallbacks[3],
+      crop: "wide",
+      width: 1920,
+    }),
+  ]);
+
+  const darkBreakEyebrow =
+    (darkBreak?.eyebrow && darkBreak.eyebrow.trim()) || "The Plan";
+  const darkBreakQuote =
+    (darkBreak?.quote && darkBreak.quote.trim()) ||
+    "A real closing date, not a fantasy.";
+  const darkBreakAttribution =
+    darkBreak?.attribution && darkBreak.attribution.trim()
+      ? darkBreak.attribution
+      : undefined;
+
   return (
     <>
       {/* HERO */}
-      <section className="relative min-h-[85vh] w-full overflow-hidden bg-oxblood-dark">
+      <section className="relative min-h-[85vh] w-full overflow-hidden bg-navy-dark">
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85')",
+            backgroundImage: `url('${heroBg}')`,
           }}
         />
         <div className="absolute inset-0 overlay-hero" />
 
-        <div className="relative z-10 min-h-[85vh] flex flex-col items-center justify-center text-center px-6 pt-32 pb-16">
-          <p className="eyebrow-light mb-10">A Program for Renters</p>
+        <div className="relative z-10 min-h-[85vh] flex flex-col items-center justify-center text-center px-6 pt-28 md:pt-32 pb-14 md:pb-16">
+          <p className="eyebrow-light mb-10">{c.hero.eyebrow}</p>
           <h1
             className="heading-display text-white"
             style={{
@@ -79,15 +139,18 @@ export default function PathPage() {
               lineHeight: 1.04,
             }}
           >
-            Path to
-            <br />
-            Ownership
+            <ShimmerText>
+              {c.hero.titleLines.map((line, i) => (
+                <span key={i}>
+                  {line}
+                  {i < c.hero.titleLines.length - 1 && <br />}
+                </span>
+              ))}
+            </ShimmerText>
           </h1>
           <div className="mt-12 w-16 h-px bg-white/40" />
           <p className="mt-12 max-w-2xl text-base md:text-lg font-light text-white/90 leading-[1.95]">
-            A guided 12-to-24 month plan to take you from renting to closing.
-            <br />
-            <span className="italic">No pressure. No guesswork. No cost to start.</span>
+            {c.hero.subtitle}
           </p>
         </div>
       </section>
@@ -95,25 +158,23 @@ export default function PathPage() {
       {/* The truth */}
       <section className="section-y-lg gutter-x">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="eyebrow mb-10">The Truth</p>
+          <p className="eyebrow mb-10">{c.truth.eyebrow}</p>
           <h2
             className="heading-section text-ink mb-12"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.25rem)" }}
           >
-            You're closer than you think.
+            {c.truth.heading}
           </h2>
-          <div className="mx-auto mb-14 w-12 h-px bg-oxblood/40" />
+          <div className="mx-auto mb-14 w-12 h-px bg-navy/40" />
           <p className="text-lg md:text-xl font-light leading-[1.9] text-ink/85">
-            Most renters in Northern Virginia and Maryland believe homeownership
-            is years — or a lifetime — away. The truth is, with the right plan,
-            most of them are 12 to 24 months from closing on their first home.
+            {c.truth.body}
           </p>
         </div>
       </section>
 
-      {/* Steps */}
-      <section className="bg-cream-soft section-y-lg gutter-x">
-        <div className="max-w-3xl mx-auto text-center mb-20 md:mb-24">
+      {/* Steps — sticky-pin stack with photo backgrounds */}
+      <section className="bg-cream-soft pt-32 md:pt-40 pb-20 md:pb-28 gutter-x">
+        <div className="max-w-3xl mx-auto text-center">
           <p className="eyebrow mb-8">The Process</p>
           <h2
             className="heading-section text-ink"
@@ -122,75 +183,86 @@ export default function PathPage() {
             Four Steps to the Front Door
           </h2>
         </div>
-        <div className="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
-          {steps.map((s) => (
-            <div key={s.n} className="glass-light p-10 md:p-12 flex flex-col">
-              <p
-                className="text-5xl md:text-6xl text-oxblood/40 mb-8"
-                style={{ fontWeight: 200 }}
-              >
-                {s.n}
-              </p>
-              <div className="my-2 mb-6 w-10 h-px bg-oxblood/40" />
-              <h3
-                className="text-lg uppercase mb-5 text-ink"
-                style={{ fontWeight: 300, letterSpacing: "0.08em" }}
-              >
-                {s.title}
-              </h3>
-              <p className="text-sm font-light leading-[1.85] text-ink/75">
-                {s.body}
-              </p>
-            </div>
-          ))}
-        </div>
       </section>
+      <StackedCards>
+        {(c.steps ?? []).map((s, i) => (
+          <div
+            key={s.n || i}
+            className="relative w-full h-full overflow-hidden bg-navy-dark"
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{
+                backgroundImage: `url('${stepImages[i % stepImages.length]}')`,
+              }}
+            />
+            <div className="absolute inset-0 overlay-hero" />
+            <div className="relative z-10 h-full flex items-center justify-center">
+              <div className="glass-dark max-w-2xl w-full mx-auto p-10 md:p-14 text-center text-white">
+                <p
+                  className="text-5xl md:text-6xl text-white/40 mb-6"
+                  style={{ fontWeight: 200 }}
+                >
+                  {s.n}
+                </p>
+                <div className="mx-auto mb-8 w-12 h-px bg-white/40" />
+                <h3
+                  className="text-xl md:text-2xl uppercase mb-8"
+                  style={{ fontWeight: 300, letterSpacing: "0.1em" }}
+                >
+                  {s.title}
+                </h3>
+                <p className="text-base md:text-lg font-light leading-[1.95] text-white/85 max-w-lg mx-auto">
+                  {s.body}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </StackedCards>
 
       {/* Stats */}
       <section className="section-y gutter-x">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-16 text-center">
-          {[
-            { v: "$0", l: "What you pay Samina to start" },
-            { v: "12–24", l: "Months from first call to closing" },
-            { v: "2", l: "States — Virginia & Maryland" },
-          ].map((s) => (
-            <div key={s.l}>
-              <p
-                className="text-5xl md:text-6xl text-oxblood mb-6"
-                style={{ fontWeight: 200 }}
-              >
-                {s.v}
-              </p>
-              <div className="mx-auto mb-5 w-8 h-px bg-oxblood/40" />
-              <p className="text-[0.7rem] tracking-[0.32em] uppercase text-ink-muted leading-[1.7]">
-                {s.l}
-              </p>
-            </div>
-          ))}
+          {(c.stats ?? []).map((s) => {
+            const num =
+              typeof s.to === "number" ? s.to : parseFloat(String(s.to)) || 0;
+            return (
+              <div key={s.label}>
+                <p
+                  className="text-5xl md:text-6xl text-navy mb-6"
+                  style={{ fontWeight: 200 }}
+                >
+                  <Counter to={num} prefix={s.prefix} suffix={s.suffix} />
+                </p>
+                <div className="mx-auto mb-5 w-8 h-px bg-navy/40" />
+                <p className="text-[0.7rem] tracking-[0.32em] uppercase text-ink-muted leading-[1.7]">
+                  {s.label}
+                </p>
+              </div>
+            );
+          })}
         </div>
       </section>
 
       {/* Who it's for */}
       <section className="bg-cream-soft section-y-lg gutter-x">
-        <div className="max-w-3xl mx-auto text-center mb-20 md:mb-24">
-          <p className="eyebrow mb-8">Who It's For</p>
+        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-24">
+          <p className="eyebrow mb-8">{c.forWho.eyebrow}</p>
           <h2
             className="heading-section text-ink"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.25rem)" }}
           >
-            Built for Real People
+            {c.forWho.heading}
           </h2>
         </div>
         <div className="max-w-3xl mx-auto space-y-6 text-base md:text-lg font-light text-ink/85 leading-[1.9]">
-          {[
-            "Renters tired of the rent-increase cycle",
-            "First-generation buyers in your family",
-            "VA loan-eligible service members and veterans",
-            "Couples planning ahead before a wedding, baby, or move",
-            "Anyone who's been told 'no' by a bank and isn't sure why",
-          ].map((line) => (
+          {c.forWho.lines.map((line) => (
             <div key={line} className="flex items-start gap-5">
-              <span className="text-oxblood text-2xl leading-none mt-1.5" style={{ fontWeight: 200 }}>
+              <span
+                className="text-navy text-2xl leading-none mt-1.5"
+                style={{ fontWeight: 200 }}
+              >
                 ·
               </span>
               <p>{line}</p>
@@ -199,10 +271,19 @@ export default function PathPage() {
         </div>
       </section>
 
+      {/* Dark break — separates "who it's for" from FAQ */}
+      <DarkBreak
+        bgImage={darkBreakBg}
+        eyebrow={darkBreakEyebrow}
+        quote={darkBreakQuote}
+        attribution={darkBreakAttribution}
+        height="sm"
+      />
+
       {/* FAQ */}
       <section className="section-y-lg gutter-x">
         <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-20 md:mb-24">
+          <div className="text-center mb-12 md:mb-24">
             <p className="eyebrow mb-8">Common Questions</p>
             <h2
               className="heading-section text-ink"
@@ -212,14 +293,14 @@ export default function PathPage() {
             </h2>
           </div>
           <div className="space-y-4">
-            {faqs.map((f) => (
+            {(c.faqs ?? []).map((f) => (
               <details
                 key={f.q}
                 className="group glass-light px-8 md:px-10 py-7 transition-all"
               >
                 <summary className="cursor-pointer flex items-center justify-between text-base md:text-lg font-light text-ink list-none">
                   <span>{f.q}</span>
-                  <span className="text-oxblood text-2xl ml-6 group-open:rotate-45 transition-transform duration-400 ease-editorial flex-shrink-0">
+                  <span className="text-navy text-2xl ml-6 group-open:rotate-45 transition-transform duration-400 ease-editorial flex-shrink-0">
                     +
                   </span>
                 </summary>
@@ -233,12 +314,11 @@ export default function PathPage() {
       </section>
 
       {/* CTA */}
-      <section className="relative bg-oxblood text-white section-y gutter-x overflow-hidden">
+      <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
           style={{
-            backgroundImage:
-              "url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85')",
+            backgroundImage: `url('${ctaBg}')`,
           }}
         />
         <div className="relative max-w-3xl mx-auto text-center">
@@ -246,16 +326,14 @@ export default function PathPage() {
             className="heading-section mb-10"
             style={{ fontSize: "clamp(1.6rem, 3vw, 2.25rem)" }}
           >
-            Take the First Step.
-            <br />
-            It's Free.
+            {c.cta.heading}
           </h2>
           <div className="mx-auto mb-10 w-12 h-px bg-white/40" />
           <p className="text-base md:text-lg font-light leading-[1.9] text-white/85 max-w-xl mx-auto mb-14">
-            Schedule a 30-minute, no-pressure conversation with Samina.
+            {c.cta.body}
           </p>
-          <Link href="/contact" className="btn-glass">
-            Book My Consult
+          <Link href={c.cta.primary.href} className="btn-glass">
+            {c.cta.primary.label}
           </Link>
         </div>
       </section>

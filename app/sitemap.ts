@@ -7,12 +7,15 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const pages = [
     "",
     "/about",
-    "/communities",
-    "/path-to-ownership",
-    "/closings",
+    "/buyers",
     "/sellers",
+    "/path-to-ownership",
+    "/communities",
+    "/closings",
+    "/partners",
     "/reviews",
     "/contact",
+    "/privacy",
   ];
 
   const now = new Date();
