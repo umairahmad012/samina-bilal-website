@@ -18,7 +18,7 @@ export default async function ClosingsAdminPage() {
   const { data: closings } = await supabase
     .from("closings")
     .select(
-      `id, image_id, neighborhood, city, state, closed_year, display_order, is_visible,
+      `id, image_id, image_crop, neighborhood, city, state, closed_year, display_order, is_visible,
        media:image_id ( cloudinary_public_id, url )`,
     )
     .order("display_order", { ascending: true });

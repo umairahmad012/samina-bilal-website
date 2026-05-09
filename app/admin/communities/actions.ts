@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { CropArea } from "@/components/admin/media/CropEditor";
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -21,10 +22,14 @@ export type CommunityInput = {
   market_type: string;
   data_year: number;
   image_id: string | null;
+  /** User-applied crop window for the community card photo (0–1 pcts). */
+  image_crop: CropArea | null;
   /** Optional override — if set, the /communities/[slug] hero uses this
    *  photo instead of `image_id`. Lets you keep a tight square for the card
    *  grid and a wider hero shot for the detail page. */
   hero_image_id: string | null;
+  /** User-applied crop window for the hero photo (0–1 pcts). */
+  hero_image_crop: CropArea | null;
   is_visible: boolean;
   price_tiers: { tier: string; description: string }[];
   life: { schools: string; parks: string; dining: string; commute: string };
@@ -155,6 +160,8 @@ export async function seedDefaultCommunities(): Promise<Result> {
       is_visible: true,
       price_tiers: c.priceTiers,
       life: c.life,
+      image_crop: null,
+      hero_image_crop: null,
     }));
 
   if (toInsert.length === 0) {

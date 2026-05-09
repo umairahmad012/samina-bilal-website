@@ -2,11 +2,13 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import type { CropArea } from "@/components/admin/media/CropEditor";
 
 type Result = { ok: true } | { ok: false; error: string };
 
 export type ClosingInput = {
   image_id: string | null;
+  image_crop: CropArea | null;
   neighborhood: string;
   city: string;
   state: string;

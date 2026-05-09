@@ -169,6 +169,8 @@ export default function CommunityForm({
             crop="wide"
             value={v.image_id}
             onChange={(id) => set("image_id", id)}
+            cropArea={v.image_crop ?? null}
+            onCropAreaChange={(c) => set("image_crop", c)}
             library={library}
             emptyText="No photo selected — upload or pick from library."
           />
@@ -178,6 +180,8 @@ export default function CommunityForm({
               crop="wide"
               value={v.hero_image_id}
               onChange={(id) => set("hero_image_id", id)}
+              cropArea={v.hero_image_crop ?? null}
+              onCropAreaChange={(c) => set("hero_image_crop", c)}
               library={library}
               emptyText="Leave blank to reuse the Community Photo above. Pick a different shot here if you want a wider/different hero on the community detail page."
             />

@@ -20,11 +20,13 @@ import {
   type ClosingInput,
 } from "@/app/admin/closings/actions";
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
+import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
 
 export type ClosingRow = {
   id: string;
   image_id: string | null;
+  image_crop: CropArea | null;
   neighborhood: string | null;
   city: string | null;
   state: string | null;
@@ -208,6 +210,7 @@ function ClosingDialog({
 }) {
   const [v, setV] = useState<ClosingInput>({
     image_id: existing?.image_id ?? null,
+    image_crop: existing?.image_crop ?? null,
     neighborhood: existing?.neighborhood ?? "",
     city: existing?.city ?? "",
     state: existing?.state ?? "VA",
@@ -255,6 +258,8 @@ function ClosingDialog({
             crop="landscape"
             value={v.image_id}
             onChange={(id) => set("image_id", id)}
+            cropArea={v.image_crop ?? null}
+            onCropAreaChange={(c) => set("image_crop", c)}
             library={library}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

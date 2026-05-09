@@ -26,6 +26,7 @@ import {
 import ImagePicker, {
   type LibraryItem,
 } from "@/components/admin/media/ImagePicker";
+import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
 
 export type CategoryRow = {
@@ -47,7 +48,9 @@ export type PartnerRow = {
   display_order: number;
   is_visible: boolean;
   photo_id: string | null;
+  photo_crop: CropArea | null;
   logo_id: string | null;
+  logo_crop: CropArea | null;
 };
 
 export default function PartnersManager({
@@ -447,7 +450,9 @@ function PartnerDialog({
     email: existing?.email ?? "",
     is_visible: existing?.is_visible ?? true,
     photo_id: existing?.photo_id ?? null,
+    photo_crop: existing?.photo_crop ?? null,
     logo_id: existing?.logo_id ?? null,
+    logo_crop: existing?.logo_crop ?? null,
   });
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -524,6 +529,8 @@ function PartnerDialog({
             crop="square"
             value={v.photo_id}
             onChange={(id) => set("photo_id", id)}
+            cropArea={v.photo_crop ?? null}
+            onCropAreaChange={(c) => set("photo_crop", c)}
             library={library}
             emptyText="No photo. Optional — shown as a circular avatar on the partners page."
           />
@@ -532,6 +539,8 @@ function PartnerDialog({
             crop="free"
             value={v.logo_id}
             onChange={(id) => set("logo_id", id)}
+            cropArea={v.logo_crop ?? null}
+            onCropAreaChange={(c) => set("logo_crop", c)}
             library={library}
             emptyText="No logo. Optional — shown next to the company name."
           />

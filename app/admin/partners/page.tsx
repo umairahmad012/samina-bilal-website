@@ -33,7 +33,7 @@ export default async function PartnersAdminPage() {
     supabase
       .from("partners")
       .select(
-        "id, category_id, name, role, company, phone, email, display_order, is_visible, photo_id, logo_id",
+        "id, category_id, name, role, company, phone, email, display_order, is_visible, photo_id, photo_crop, logo_id, logo_crop",
       )
       .order("display_order", { ascending: true }),
     supabase

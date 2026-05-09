@@ -10,6 +10,22 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { communities as staticCommunities, type Community } from "./communities";
 import { cldUrl } from "./cloudinary";
 
+function asCropArea(
+  v: unknown,
+): { x: number; y: number; width: number; height: number } | undefined {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const r = v as Record<string, unknown>;
+  if (
+    typeof r.x === "number" &&
+    typeof r.y === "number" &&
+    typeof r.width === "number" &&
+    typeof r.height === "number"
+  ) {
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  }
+  return undefined;
+}
+
 let cached: SupabaseClient | null = null;
 function getServiceClient(): SupabaseClient | null {
   if (
@@ -43,7 +59,9 @@ type DbRow = {
   market_type: string | null;
   data_year: number;
   image_id: string | null;
+  image_crop?: unknown;
   hero_image_id?: string | null;
+  hero_image_crop?: unknown;
   display_order: number;
   is_visible: boolean;
   price_tiers?: unknown;
@@ -54,11 +72,21 @@ type DbRow = {
 
 function rowToCommunity(row: DbRow, fallback?: Community): Community {
   // image: prefer Cloudinary-derived URL with wide crop for cards/hero
+  const imageCrop = asCropArea(row.image_crop);
+  const heroImageCrop = asCropArea(row.hero_image_crop);
   const imageFromDb = row.media?.cloudinary_public_id
-    ? cldUrl(row.media.cloudinary_public_id, { crop: "wide", width: 1600 })
+    ? cldUrl(row.media.cloudinary_public_id, {
+        crop: "wide",
+        width: 1600,
+        cropArea: imageCrop,
+      })
     : row.media?.url || null;
   const heroImageFromDb = row.hero_media?.cloudinary_public_id
-    ? cldUrl(row.hero_media.cloudinary_public_id, { crop: "wide", width: 1920 })
+    ? cldUrl(row.hero_media.cloudinary_public_id, {
+        crop: "wide",
+        width: 1920,
+        cropArea: heroImageCrop,
+      })
     : row.hero_media?.url || null;
 
   const priceTiers = Array.isArray(row.price_tiers)
@@ -111,7 +139,8 @@ export async function getCommunities(): Promise<Community[]> {
       .select(
         `id, slug, name, state, tagline, about, market_year_summary, samina_quote,
          median_price, yoy_change, yoy_direction, days_on_market, market_type, data_year,
-         image_id, hero_image_id, display_order, is_visible, price_tiers, life,
+         image_id, image_crop, hero_image_id, hero_image_crop,
+         display_order, is_visible, price_tiers, life,
          media:image_id ( cloudinary_public_id, url ),
          hero_media:hero_image_id ( cloudinary_public_id, url )`,
       )
@@ -138,7 +167,8 @@ export async function getCommunityBySlug(slug: string): Promise<Community | null
       .select(
         `id, slug, name, state, tagline, about, market_year_summary, samina_quote,
          median_price, yoy_change, yoy_direction, days_on_market, market_type, data_year,
-         image_id, hero_image_id, display_order, is_visible, price_tiers, life,
+         image_id, image_crop, hero_image_id, hero_image_crop,
+         display_order, is_visible, price_tiers, life,
          media:image_id ( cloudinary_public_id, url ),
          hero_media:hero_image_id ( cloudinary_public_id, url )`,
       )

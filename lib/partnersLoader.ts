@@ -7,6 +7,22 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { content } from "./content";
 import { cldUrl } from "./cloudinary";
 
+function asCropArea(
+  v: unknown,
+): { x: number; y: number; width: number; height: number } | undefined {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const r = v as Record<string, unknown>;
+  if (
+    typeof r.x === "number" &&
+    typeof r.y === "number" &&
+    typeof r.width === "number" &&
+    typeof r.height === "number"
+  ) {
+    return { x: r.x, y: r.y, width: r.width, height: r.height };
+  }
+  return undefined;
+}
+
 let cached: SupabaseClient | null = null;
 function client(): SupabaseClient | null {
   if (
@@ -59,7 +75,9 @@ type PartnerRow = {
   email: string | null;
   display_order: number;
   photo_id?: string | null;
+  photo_crop?: unknown;
   logo_id?: string | null;
+  logo_crop?: unknown;
   photo_media?: { cloudinary_public_id: string | null; url: string } | null;
   logo_media?: { cloudinary_public_id: string | null; url: string } | null;
 };
@@ -79,7 +97,7 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
         .from("partners")
         .select(
           `id, category_id, name, role, company, phone, email, display_order,
-           photo_id, logo_id,
+           photo_id, photo_crop, logo_id, logo_crop,
            photo_media:photo_id ( cloudinary_public_id, url ),
            logo_media:logo_id ( cloudinary_public_id, url )`,
         )
@@ -105,10 +123,14 @@ export async function getPartnerCategories(): Promise<PartnerCategory[]> {
           ? cldUrl(p.photo_media.cloudinary_public_id, {
               crop: "square",
               width: 320,
+              cropArea: asCropArea(p.photo_crop),
             })
           : (p.photo_media?.url ?? "");
         const logoUrl = p.logo_media?.cloudinary_public_id
-          ? cldUrl(p.logo_media.cloudinary_public_id, { width: 240 })
+          ? cldUrl(p.logo_media.cloudinary_public_id, {
+              width: 240,
+              cropArea: asCropArea(p.logo_crop),
+            })
           : (p.logo_media?.url ?? "");
         return {
           name: p.name,
