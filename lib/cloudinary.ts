@@ -36,6 +36,17 @@ export type CldOptions = {
   height?: number;
   /** Override the gravity used by aspect-ratio crops. Default 'auto'. */
   gravity?: "auto" | "face" | "faces" | "center";
+  /**
+   * User-defined crop window from the admin Crop Editor. All values 0–1,
+   * percentages of the source image. When set, applied as `c_crop,...`
+   * BEFORE the aspect-ratio fill, so the user's framing wins over auto.
+   */
+  cropArea?: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  };
 };
 
 /**
@@ -48,30 +59,54 @@ export function cldUrl(publicId: string, opts: CldOptions = {}): string {
   if (!CLOUD_NAME) return ""; // Fail soft — caller should fall back
   if (!publicId) return "";
 
-  const parts: string[] = [];
+  // We use Cloudinary's "chained transformations" — each "/"-separated
+  // segment runs in sequence. With a user-defined crop window, we put it
+  // FIRST so the explicit framing wins, then chain a fill-by-aspect-ratio
+  // resize for delivery.
+  const segments: string[][] = [];
 
-  if (opts.removeBackground) {
-    parts.push("e_background_removal");
-    // Always use PNG when removing background (transparency)
-    parts.push("f_png");
-  } else {
-    parts.push("f_auto");
+  // 1) User-defined crop (if any) — applied first against the original
+  if (
+    opts.cropArea &&
+    opts.cropArea.width > 0 &&
+    opts.cropArea.height > 0
+  ) {
+    const c = opts.cropArea;
+    // Cloudinary accepts decimals 0–1 as percentages of the source dimensions
+    segments.push([
+      "c_crop",
+      `x_${roundDec(c.x)}`,
+      `y_${roundDec(c.y)}`,
+      `w_${roundDec(c.width)}`,
+      `h_${roundDec(c.height)}`,
+    ]);
   }
 
+  // 2) Aspect-ratio fill / format / size for final delivery
+  const finalSegment: string[] = [];
+  if (opts.removeBackground) {
+    finalSegment.push("e_background_removal", "f_png");
+  } else {
+    finalSegment.push("f_auto");
+  }
   if (opts.crop && opts.crop !== "free") {
     const ar = ASPECT_FOR[opts.crop];
     if (ar) {
-      parts.push("c_fill");
-      parts.push(`ar_${ar}`);
-      parts.push(`g_${opts.gravity ?? "auto"}`);
+      finalSegment.push("c_fill", `ar_${ar}`, `g_${opts.gravity ?? "auto"}`);
     }
   }
+  if (opts.width) finalSegment.push(`w_${opts.width}`);
+  if (opts.height) finalSegment.push(`h_${opts.height}`);
+  finalSegment.push("q_auto");
+  segments.push(finalSegment);
 
-  if (opts.width) parts.push(`w_${opts.width}`);
-  if (opts.height) parts.push(`h_${opts.height}`);
-  parts.push("q_auto");
+  const transform = segments.map((s) => s.join(",")).join("/");
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${transform}/${publicId}`;
+}
 
-  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/${parts.join(",")}/${publicId}`;
+function roundDec(n: number): string {
+  // 4 decimals is plenty for crop coords; keep URLs readable
+  return Number(n.toFixed(4)).toString();
 }
 
 /**

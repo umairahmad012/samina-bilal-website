@@ -134,12 +134,30 @@ function ImageField({
   const library = useContext(MediaLibraryContext);
   const record = asRecord(value);
   const imageId = typeof record.image_id === "string" ? record.image_id : null;
+  const ca = record.cropArea;
+  const cropArea =
+    ca &&
+    typeof ca === "object" &&
+    !Array.isArray(ca) &&
+    typeof (ca as Record<string, unknown>).x === "number" &&
+    typeof (ca as Record<string, unknown>).y === "number" &&
+    typeof (ca as Record<string, unknown>).width === "number" &&
+    typeof (ca as Record<string, unknown>).height === "number"
+      ? (ca as { x: number; y: number; width: number; height: number })
+      : null;
+
   return (
     <ImagePicker
       label={field.label}
       crop={field.crop ?? "free"}
       value={imageId}
-      onChange={(id) => onChange({ image_id: id })}
+      onChange={(id) =>
+        onChange({ image_id: id, cropArea: cropArea ?? undefined })
+      }
+      cropArea={cropArea}
+      onCropAreaChange={(next) =>
+        onChange({ image_id: imageId, cropArea: next ?? undefined })
+      }
       library={library.filter((m) => m.kind === "image")}
       emptyText={field.help ?? "No image selected — upload or pick from library."}
       fallbackUrl={field.fallback}

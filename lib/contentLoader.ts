@@ -154,14 +154,42 @@ export async function resolveImageUrl(
     width?: number;
   },
 ): Promise<string> {
-  const id =
+  const record =
     imageField &&
     typeof imageField === "object" &&
-    !Array.isArray(imageField) &&
-    typeof (imageField as Record<string, unknown>).image_id === "string"
-      ? ((imageField as Record<string, unknown>).image_id as string)
+    !Array.isArray(imageField)
+      ? (imageField as Record<string, unknown>)
+      : null;
+
+  const id =
+    record && typeof record.image_id === "string"
+      ? (record.image_id as string)
       : null;
   if (!id) return options.fallback;
+
+  // Read the user-applied crop window if present (set via the in-admin
+  // Crop Editor). Format: { x, y, width, height }, all 0–1 percentages of
+  // the source image dimensions.
+  let cropArea:
+    | { x: number; y: number; width: number; height: number }
+    | undefined;
+  const ca = record?.cropArea;
+  if (
+    ca &&
+    typeof ca === "object" &&
+    !Array.isArray(ca) &&
+    typeof (ca as Record<string, unknown>).x === "number" &&
+    typeof (ca as Record<string, unknown>).y === "number" &&
+    typeof (ca as Record<string, unknown>).width === "number" &&
+    typeof (ca as Record<string, unknown>).height === "number"
+  ) {
+    cropArea = ca as {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    };
+  }
 
   try {
     const supabase = getServiceClient();
@@ -180,6 +208,7 @@ export async function resolveImageUrl(
       return cldUrl(media.cloudinary_public_id, {
         crop,
         width: options.width ?? 1920,
+        cropArea,
       });
     }
     return media.url || options.fallback;
