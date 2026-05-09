@@ -6,7 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, Save, RotateCcw, Check } from "lucide-react";
 import type { SectionDef } from "@/lib/contentRegistry";
 import { FieldRenderer, MediaLibraryProvider } from "./Fields";
-import type { LibraryItem } from "@/components/admin/media/ImagePicker";
+import type { VideoLibraryItem } from "@/components/admin/media/VideoPicker";
 import { saveSection } from "@/app/admin/content/actions";
 
 export default function SectionEditor({
@@ -20,7 +20,7 @@ export default function SectionEditor({
   initialValue: Record<string, unknown>;
   defaultValue: Record<string, unknown>;
   pageHref: string;
-  library: LibraryItem[];
+  library: VideoLibraryItem[];
 }) {
   const router = useRouter();
   const [value, setValue] = useState<Record<string, unknown>>(initialValue);

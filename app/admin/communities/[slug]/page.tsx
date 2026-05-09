@@ -22,7 +22,7 @@ export default async function EditCommunityPage({
     .select(
       `id, slug, name, state, tagline, about, market_year_summary, samina_quote,
        median_price, yoy_change, yoy_direction, days_on_market, market_type,
-       data_year, image_id, is_visible, price_tiers, life`,
+       data_year, image_id, hero_image_id, is_visible, price_tiers, life`,
     )
     .eq("slug", slug)
     .maybeSingle();
@@ -50,6 +50,7 @@ export default async function EditCommunityPage({
     market_type: row.market_type ?? "Balanced",
     data_year: row.data_year ?? new Date().getFullYear(),
     image_id: row.image_id ?? null,
+    hero_image_id: row.hero_image_id ?? null,
     is_visible: row.is_visible ?? true,
     price_tiers: Array.isArray(row.price_tiers)
       ? (row.price_tiers as CommunityInput["price_tiers"])

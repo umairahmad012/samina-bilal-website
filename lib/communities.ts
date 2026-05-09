@@ -14,6 +14,9 @@ export type Community = {
   life: { schools: string; parks: string; dining: string; commute: string };
   saminaQuote: string;
   image: string;
+  /** Optional override for the /communities/[slug] hero. Falls back to
+   *  `image` when not set. */
+  heroImage?: string;
 };
 
 export const communities: Community[] = [

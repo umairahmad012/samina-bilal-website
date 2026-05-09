@@ -43,11 +43,13 @@ type DbRow = {
   market_type: string | null;
   data_year: number;
   image_id: string | null;
+  hero_image_id?: string | null;
   display_order: number;
   is_visible: boolean;
   price_tiers?: unknown;
   life?: unknown;
   media?: { cloudinary_public_id: string | null; url: string } | null;
+  hero_media?: { cloudinary_public_id: string | null; url: string } | null;
 };
 
 function rowToCommunity(row: DbRow, fallback?: Community): Community {
@@ -55,6 +57,9 @@ function rowToCommunity(row: DbRow, fallback?: Community): Community {
   const imageFromDb = row.media?.cloudinary_public_id
     ? cldUrl(row.media.cloudinary_public_id, { crop: "wide", width: 1600 })
     : row.media?.url || null;
+  const heroImageFromDb = row.hero_media?.cloudinary_public_id
+    ? cldUrl(row.hero_media.cloudinary_public_id, { crop: "wide", width: 1920 })
+    : row.hero_media?.url || null;
 
   const priceTiers = Array.isArray(row.price_tiers)
     ? (row.price_tiers as Community["priceTiers"])
@@ -86,6 +91,7 @@ function rowToCommunity(row: DbRow, fallback?: Community): Community {
     life: lifeObj,
     saminaQuote: row.samina_quote ?? fallback?.saminaQuote ?? "",
     image: imageFromDb ?? fallback?.image ?? "",
+    heroImage: heroImageFromDb ?? undefined,
   };
 }
 
@@ -105,8 +111,9 @@ export async function getCommunities(): Promise<Community[]> {
       .select(
         `id, slug, name, state, tagline, about, market_year_summary, samina_quote,
          median_price, yoy_change, yoy_direction, days_on_market, market_type, data_year,
-         image_id, display_order, is_visible, price_tiers, life,
-         media:image_id ( cloudinary_public_id, url )`,
+         image_id, hero_image_id, display_order, is_visible, price_tiers, life,
+         media:image_id ( cloudinary_public_id, url ),
+         hero_media:hero_image_id ( cloudinary_public_id, url )`,
       )
       .eq("is_visible", true)
       .order("display_order", { ascending: true });
@@ -131,8 +138,9 @@ export async function getCommunityBySlug(slug: string): Promise<Community | null
       .select(
         `id, slug, name, state, tagline, about, market_year_summary, samina_quote,
          median_price, yoy_change, yoy_direction, days_on_market, market_type, data_year,
-         image_id, display_order, is_visible, price_tiers, life,
-         media:image_id ( cloudinary_public_id, url )`,
+         image_id, hero_image_id, display_order, is_visible, price_tiers, life,
+         media:image_id ( cloudinary_public_id, url ),
+         hero_media:hero_image_id ( cloudinary_public_id, url )`,
       )
       .eq("slug", slug)
       .maybeSingle();

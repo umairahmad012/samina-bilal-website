@@ -21,6 +21,10 @@ export type CommunityInput = {
   market_type: string;
   data_year: number;
   image_id: string | null;
+  /** Optional override — if set, the /communities/[slug] hero uses this
+   *  photo instead of `image_id`. Lets you keep a tight square for the card
+   *  grid and a wider hero shot for the detail page. */
+  hero_image_id: string | null;
   is_visible: boolean;
   price_tiers: { tier: string; description: string }[];
   life: { schools: string; parks: string; dining: string; commute: string };

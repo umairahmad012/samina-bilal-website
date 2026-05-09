@@ -33,6 +33,7 @@ export default async function NewCommunityPage() {
     market_type: "Balanced",
     data_year: new Date().getFullYear(),
     image_id: null,
+    hero_image_id: null,
     is_visible: true,
     price_tiers: [],
     life: { schools: "", parks: "", dining: "", commute: "" },

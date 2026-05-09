@@ -47,6 +47,15 @@ export type Field =
        *  the page's current hardcoded fallback so admins see what they're
        *  about to replace. */
       fallback?: string;
+    }
+  | {
+      /** Pick a YouTube video from the Media Library. Used for muted-loop
+       *  hero backgrounds. Stored value is { media_id: <uuid> }. */
+      type: "video";
+      label: string;
+      help?: string;
+      /** YouTube ID or full URL shown as preview when nothing's picked. */
+      fallbackYouTubeId?: string;
     };
 
 export type SectionDef = {
@@ -267,9 +276,15 @@ export const SECTIONS: SectionDef[] = [
     page: "home",
     key: "hero",
     label: "Hero",
-    description: "The big opening section with portrait, title, and stats.",
+    description: "The big opening section with title, video, and stats.",
     shape: {
       ...heroFields,
+      backgroundVideo: {
+        type: "video",
+        label: "Background Video",
+        help:
+          "A YouTube video set to autoplay, mute, and loop. Add YouTube videos in the Media Library first, then pick one here. Leave blank to use the default mp4 sea-turtle clip.",
+      },
       ctas: {
         type: "array",
         label: "Buttons",
@@ -702,13 +717,24 @@ export const SECTIONS: SectionDef[] = [
   {
     page: "sellers",
     key: "darkBreak",
-    label: "Dark Break Divider",
+    label: "Dark Break Divider 1",
     description: "Photo strip between process and pricing strategy.",
     shape: makeDarkBreakShape({
       fallbackBg:
         "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1920&auto=format&fit=crop&q=85",
       defaultEyebrow: "Pricing & Marketing",
       defaultQuote: "The first fourteen days are everything.",
+    }),
+  },
+  {
+    page: "sellers",
+    key: "darkBreak2",
+    label: "Dark Break Divider 2",
+    description:
+      "Photo-only strip between the pricing strategy and the valuation form. No copy by default — just a transitional photo.",
+    shape: makeDarkBreakShape({
+      fallbackBg:
+        "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&auto=format&fit=crop&q=85",
     }),
   },
 

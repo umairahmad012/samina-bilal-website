@@ -189,6 +189,69 @@ export async function resolveImageUrl(
 }
 
 /**
+ * Resolve a `video` content field to a playable URL.
+ *
+ * Returns:
+ *   { kind: "youtube", embedUrl, watchUrl, thumbnail, id }  if a YouTube
+ *     row was picked, or a fallback YouTube ID was provided
+ *   { kind: "fallback" }  if neither — caller renders its own default
+ */
+export async function resolveVideoUrl(
+  videoField: unknown,
+  options: { fallbackYouTubeId?: string } = {},
+): Promise<
+  | { kind: "youtube"; id: string; embedUrl: string; watchUrl: string; thumbnail: string }
+  | { kind: "fallback" }
+> {
+  const id =
+    videoField &&
+    typeof videoField === "object" &&
+    !Array.isArray(videoField) &&
+    typeof (videoField as Record<string, unknown>).media_id === "string"
+      ? ((videoField as Record<string, unknown>).media_id as string)
+      : null;
+
+  let youTubeId: string | null = null;
+
+  if (id) {
+    try {
+      const supabase = getServiceClient();
+      if (supabase) {
+        const { data: media } = await supabase
+          .from("media")
+          .select("kind, cloudinary_public_id")
+          .eq("id", id)
+          .maybeSingle();
+        if (
+          media?.kind === "youtube" &&
+          typeof media.cloudinary_public_id === "string"
+        ) {
+          youTubeId = media.cloudinary_public_id;
+        }
+      }
+    } catch {
+      // fall through to fallback
+    }
+  }
+
+  if (!youTubeId && options.fallbackYouTubeId) {
+    youTubeId = options.fallbackYouTubeId;
+  }
+
+  if (!youTubeId) return { kind: "fallback" };
+
+  const { youTubeBackgroundEmbed, youTubeWatchUrl, youTubeThumbnail } =
+    await import("./cloudinary");
+  return {
+    kind: "youtube",
+    id: youTubeId,
+    embedUrl: youTubeBackgroundEmbed(youTubeId),
+    watchUrl: youTubeWatchUrl(youTubeId),
+    thumbnail: youTubeThumbnail(youTubeId),
+  };
+}
+
+/**
  * Brand identity is special — it lives at `content.brand` in the static
  * defaults. Cleanest accessor for site-wide use.
  */

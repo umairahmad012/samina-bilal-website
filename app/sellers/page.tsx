@@ -84,17 +84,20 @@ const processIcons = [
 ];
 
 export default async function SellersPage() {
-  const [c, darkBreak] = await Promise.all([
+  const [c, darkBreak, darkBreak2] = await Promise.all([
     getPageContent<SellersContent>("sellers"),
     getSection<DarkBreakContent>("sellers", "darkBreak"),
+    getSection<DarkBreakContent>("sellers", "darkBreak2"),
   ]);
 
   const ctaFallbackBg =
     "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1920&auto=format&fit=crop&q=85";
   const darkBreakFallbackBg =
     "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1920&auto=format&fit=crop&q=85";
+  const darkBreak2FallbackBg =
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&auto=format&fit=crop&q=85";
 
-  const [heroBg, ctaBg, darkBreakBg] = await Promise.all([
+  const [heroBg, ctaBg, darkBreakBg, darkBreak2Bg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
         "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1920&auto=format&fit=crop&q=85",
@@ -108,6 +111,11 @@ export default async function SellersPage() {
     }),
     resolveImageUrl(darkBreak?.backgroundImage, {
       fallback: darkBreakFallbackBg,
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(darkBreak2?.backgroundImage, {
+      fallback: darkBreak2FallbackBg,
       crop: "wide",
       width: 1920,
     }),
@@ -259,7 +267,15 @@ export default async function SellersPage() {
 
       {/* Dark break — leads into the valuation form */}
       <DarkBreak
-        bgImage="https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&auto=format&fit=crop&q=85"
+        bgImage={darkBreak2Bg}
+        eyebrow={
+          (darkBreak2?.eyebrow && darkBreak2.eyebrow.trim()) || undefined
+        }
+        quote={(darkBreak2?.quote && darkBreak2.quote.trim()) || undefined}
+        attribution={
+          (darkBreak2?.attribution && darkBreak2.attribution.trim()) ||
+          undefined
+        }
         height="sm"
       />
 

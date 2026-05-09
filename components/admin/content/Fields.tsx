@@ -13,19 +13,24 @@ import type { Field } from "@/lib/contentRegistry";
 import ImagePicker, {
   type LibraryItem,
 } from "@/components/admin/media/ImagePicker";
+import VideoPicker, {
+  type VideoLibraryItem,
+} from "@/components/admin/media/VideoPicker";
 import { cn } from "@/lib/cn";
 
 /**
  * The Media Library is fetched once at the top of the section editor and
- * passed down to every image field via context (avoids prop drilling).
+ * passed down to every image/video field via context (avoids prop drilling).
+ * Image rows and YouTube rows live in the same `media` table — pickers
+ * filter by `kind` themselves.
  */
-const MediaLibraryContext = createContext<LibraryItem[]>([]);
+const MediaLibraryContext = createContext<VideoLibraryItem[]>([]);
 
 export function MediaLibraryProvider({
   library,
   children,
 }: {
-  library: LibraryItem[];
+  library: VideoLibraryItem[];
   children: React.ReactNode;
 }) {
   return (
@@ -108,6 +113,9 @@ export function FieldRenderer({ field, value, onChange, depth = 0 }: FieldRender
 
     case "image":
       return <ImageField field={field} value={value} onChange={onChange} />;
+
+    case "video":
+      return <VideoField field={field} value={value} onChange={onChange} />;
   }
 }
 
@@ -132,9 +140,32 @@ function ImageField({
       crop={field.crop ?? "free"}
       value={imageId}
       onChange={(id) => onChange({ image_id: id })}
-      library={library}
+      library={library.filter((m) => m.kind === "image")}
       emptyText={field.help ?? "No image selected — upload or pick from library."}
       fallbackUrl={field.fallback}
+    />
+  );
+}
+
+function VideoField({
+  field,
+  value,
+  onChange,
+}: {
+  field: Extract<Field, { type: "video" }>;
+  value: unknown;
+  onChange: (next: unknown) => void;
+}) {
+  const library = useContext(MediaLibraryContext);
+  const record = asRecord(value);
+  const mediaId = typeof record.media_id === "string" ? record.media_id : null;
+  return (
+    <VideoPicker
+      label={field.label}
+      value={mediaId}
+      onChange={(id) => onChange({ media_id: id })}
+      library={library}
+      fallbackYouTubeId={field.fallbackYouTubeId}
     />
   );
 }

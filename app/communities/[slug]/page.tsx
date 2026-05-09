@@ -41,11 +41,12 @@ export default async function CommunityPage({
 
   return (
     <>
-      {/* HERO */}
+      {/* HERO — uses heroImage override if set, else falls back to the
+           same photo that appears on the homepage card grid */}
       <section className="relative min-h-[100vh] w-full overflow-hidden bg-navy-dark">
         <div
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: `url('${c.image}')` }}
+          style={{ backgroundImage: `url('${c.heroImage || c.image}')` }}
         />
         <div className="absolute inset-0 overlay-hero" />
 

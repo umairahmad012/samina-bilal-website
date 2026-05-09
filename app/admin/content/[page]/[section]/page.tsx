@@ -8,7 +8,7 @@ import {
   PAGE_ORDER,
   type PageKey,
 } from "@/lib/contentRegistry";
-import type { LibraryItem } from "@/components/admin/media/ImagePicker";
+import type { VideoLibraryItem } from "@/components/admin/media/VideoPicker";
 
 export default async function ContentSectionEditorPage({
   params,
@@ -49,11 +49,11 @@ export default async function ContentSectionEditorPage({
     }
   }
 
-  // Pull the media library for any image fields in this section
+  // Pull the full media library — image and youtube rows. Pickers filter
+  // by `kind` themselves.
   const { data: media } = await supabase
     .from("media")
-    .select("id, cloudinary_public_id, url, alt")
-    .eq("kind", "image")
+    .select("id, kind, cloudinary_public_id, url, alt")
     .order("uploaded_at", { ascending: false });
 
   return (
@@ -63,7 +63,7 @@ export default async function ContentSectionEditorPage({
         initialValue={initial}
         defaultValue={fallback}
         pageHref={`/admin/content/${page}`}
-        library={(media ?? []) as LibraryItem[]}
+        library={(media ?? []) as VideoLibraryItem[]}
       />
     </AdminShell>
   );

@@ -163,7 +163,7 @@ export default function CommunityForm({
         </div>
 
         {/* Image */}
-        <div className="admin-card p-6">
+        <div className="admin-card p-6 space-y-6">
           <ImagePicker
             label="Community Photo"
             crop="wide"
@@ -172,6 +172,16 @@ export default function CommunityForm({
             library={library}
             emptyText="No photo selected — upload or pick from library."
           />
+          <div className="pt-6 border-t border-black/8">
+            <ImagePicker
+              label="Hero Photo (optional)"
+              crop="wide"
+              value={v.hero_image_id}
+              onChange={(id) => set("hero_image_id", id)}
+              library={library}
+              emptyText="Leave blank to reuse the Community Photo above. Pick a different shot here if you want a wider/different hero on the community detail page."
+            />
+          </div>
         </div>
 
         {/* Editorial body */}

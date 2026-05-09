@@ -2,7 +2,11 @@ import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 import ShimmerText from "@/components/ShimmerText";
 import Counter from "@/components/Counter";
-import { getSection } from "@/lib/contentLoader";
+import {
+  getSection,
+  resolveImageUrl,
+  resolveVideoUrl,
+} from "@/lib/contentLoader";
 
 type HeroStat = {
   value: number | string;
@@ -20,7 +24,14 @@ type HeroContent = {
   subtitle: string;
   ctas: HeroCta[];
   stats: HeroStat[];
+  backgroundImage?: { image_id?: string };
+  backgroundVideo?: { media_id?: string };
 };
+
+const FALLBACK_VIDEO_MP4 =
+  "https://res.cloudinary.com/dgkg1aozt/video/upload/v1/samples/sea-turtle.mp4";
+const FALLBACK_POSTER =
+  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85";
 
 function toNumber(v: unknown): number {
   if (typeof v === "number") return v;
@@ -43,24 +54,41 @@ function asString(v: unknown): string {
 
 export default async function Hero() {
   const c = await getSection<HeroContent>("home", "hero");
+  const [posterUrl, video] = await Promise.all([
+    resolveImageUrl(c.backgroundImage, {
+      fallback: FALLBACK_POSTER,
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveVideoUrl(c.backgroundVideo),
+  ]);
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-navy-dark">
-      {/* Video / image layer */}
+      {/* Video / image layer — YouTube iframe if a video was picked,
+           otherwise the default mp4 (sea turtle) with the poster image. */}
       <div className="absolute inset-0">
-        <video
-          className="w-full h-full object-cover"
-          autoPlay
-          loop
-          muted
-          playsInline
-          poster="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85"
-        >
-          <source
-            src="https://res.cloudinary.com/dgkg1aozt/video/upload/v1/samples/sea-turtle.mp4"
-            type="video/mp4"
+        {video.kind === "youtube" ? (
+          <iframe
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
+            src={video.embedUrl}
+            title="Hero background video"
+            allow="autoplay; encrypted-media"
+            allowFullScreen={false}
+            frameBorder="0"
           />
-        </video>
+        ) : (
+          <video
+            className="w-full h-full object-cover"
+            autoPlay
+            loop
+            muted
+            playsInline
+            poster={posterUrl}
+          >
+            <source src={FALLBACK_VIDEO_MP4} type="video/mp4" />
+          </video>
+        )}
         <div className="absolute inset-0 overlay-hero" />
       </div>
 
