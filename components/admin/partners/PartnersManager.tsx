@@ -32,6 +32,7 @@ import {
   DEFAULT_PARTNER_PHOTO,
   DEFAULT_PARTNER_LOGO,
 } from "@/lib/imageDefaults";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import { AiLoader } from "@/components/ui/ai-loader";
 
 export type CategoryRow = {
@@ -187,8 +188,15 @@ function CategoryBlock({
   const [adding, setAdding] = useState(false);
   const [, startTransition] = useTransition();
 
-  function handleDeletePartner(id: string) {
-    if (!confirm("Delete this partner?")) return;
+  const confirm = useConfirm();
+  async function handleDeletePartner(id: string) {
+    const ok = await confirm({
+      title: "Delete this partner?",
+      body: "They will no longer appear on the Trusted Partners page.",
+      confirmLabel: "Delete partner",
+      danger: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       await deletePartner(id);
       router.refresh();

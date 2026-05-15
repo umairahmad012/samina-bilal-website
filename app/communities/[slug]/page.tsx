@@ -189,7 +189,7 @@ export default async function CommunityPage({
             className="text-2xl md:text-3xl lg:text-4xl leading-[1.45] text-ink italic"
             style={{ fontWeight: 200, letterSpacing: "0.005em" }}
           >
-            &ldquo;{c.saminaQuote}&rdquo;
+            &ldquo;{c.agentQuote}&rdquo;
           </blockquote>
           <div className="mx-auto my-12 w-10 h-px bg-navy/40" />
           <p className="text-[0.7rem] tracking-[0.4em] uppercase text-ink-muted">

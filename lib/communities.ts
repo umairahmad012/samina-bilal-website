@@ -12,7 +12,7 @@ export type Community = {
   market2026: string;
   priceTiers: { tier: string; description: string }[];
   life: { schools: string; parks: string; dining: string; commute: string };
-  saminaQuote: string;
+  agentQuote: string;
   image: string;
   /** Optional override for the /communities/[slug] hero. Falls back to
    *  `image` when not set. */
@@ -45,7 +45,7 @@ export const communities: Community[] = [
       dining: "Stonebridge at Potomac Town Center, Old Town Occoquan, Potomac Mills",
       commute: "30 min to Pentagon · VRE Manassas Line · I-95 + Route 1",
     },
-    saminaQuote:
+    agentQuote:
       "Woodbridge is where I live and work. It's the rare NoVa zip code where a young family can still buy something they're proud of, in a community that actually feels like one.",
     image:
       "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=1600&auto=format&fit=crop&q=80",
@@ -75,7 +75,7 @@ export const communities: Community[] = [
       dining: "Potomac Town Center, Stonebridge, Quantico waterfront",
       commute: "VRE Quantico station · I-95 · 35 min to Pentagon · adjacent to MCB Quantico",
     },
-    saminaQuote:
+    agentQuote:
       "Five years ago Dumfries was a hidden value play. Today it.s the fastest-appreciating market in the southern NoVa corridor. If you can buy here in 2026, you'll thank yourself in 2030.",
     image:
       "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=1600&auto=format&fit=crop&q=80",
@@ -105,7 +105,7 @@ export const communities: Community[] = [
       dining: "One Loudoun, Brambleton Town Center, Dulles Town Center",
       commute: "Silver Line Metro · Dulles Toll Rd · 25 min to Tysons",
     },
-    saminaQuote:
+    agentQuote:
       "Ashburn's softening isn't bad news — it's the window. The buyers I'm working with right now are getting concessions that didn't exist 18 months ago.",
     image:
       "https://images.unsplash.com/photo-1592595896616-c37162298647?w=1600&auto=format&fit=crop&q=80",
@@ -135,7 +135,7 @@ export const communities: Community[] = [
       dining: "Lorton Town Center, Workhouse Arts Center, Springfield Town Center",
       commute: "VRE Lorton station · I-95 · 35 min to Pentagon",
     },
-    saminaQuote:
+    agentQuote:
       "Lorton is where I send buyers who want the Fairfax County name without the Fairfax County sticker shock. The 19% appreciation isn't a fluke — it's the catch-up nobody saw coming.",
     image:
       "https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1600&auto=format&fit=crop&q=80",
@@ -165,7 +165,7 @@ export const communities: Community[] = [
       dining: "Stafford Marketplace, Cosner's Corner, Central Park (Fredericksburg)",
       commute: "VRE Brooke station · I-95 · 45 min to Pentagon · adjacent to MCB Quantico",
     },
-    saminaQuote:
+    agentQuote:
       "Stafford in 2026 is what Woodbridge was in 2018. Buyers who get in this year are buying ahead of the next correction up.",
     image:
       "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=1600&auto=format&fit=crop&q=80",
@@ -195,7 +195,7 @@ export const communities: Community[] = [
       dining: "Historic Old Town Manassas, Manassas Mall, Virginia Gateway",
       commute: "VRE Manassas Line (terminus) · I-66 · Route 28",
     },
-    saminaQuote:
+    agentQuote:
       "Manassas is the most under-rated city in NoVa. Old Town has restaurants you'd drive to from Arlington, and you can still buy a real house with a real yard for under $600K.",
     image:
       "https://images.unsplash.com/photo-1518883429555-e6f9e2dba8c4?w=1600&auto=format&fit=crop&q=80",

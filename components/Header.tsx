@@ -6,15 +6,31 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import Logo from "./Logo";
 import MenuDrawer from "./MenuDrawer";
-import type { SiteSettings } from "@/lib/siteSettings";
+
+export type ExtraNavItem = { label: string; href: string };
 
 export default function Header({
   portraitAvatar,
-  settings,
+  extraNavItems,
+  fixedNavItems,
+  name,
+  role,
+  phone,
+  phoneHref,
+  email,
+  emailHref,
 }: {
   portraitAvatar?: string;
-  /** Forwarded to MenuDrawer for DB-backed phone/email/avatar. */
-  settings?: SiteSettings;
+  extraNavItems?: ExtraNavItem[];
+  fixedNavItems?: ExtraNavItem[];
+  /** Brand identity from getSiteSettings(). */
+  name?: string;
+  role?: string;
+  /** Contact info from getSiteSettings(). */
+  phone?: string;
+  phoneHref?: string;
+  email?: string;
+  emailHref?: string;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -74,8 +90,13 @@ export default function Header({
       <header
         className={`fixed top-0 left-0 right-0 z-30 transition-all duration-500 ease-editorial ${headerClass}`}
       >
-        <div className="max-w-[1600px] mx-auto px-6 md:px-12 flex items-center justify-between">
-          <Logo variant={logoVariant} portraitAvatar={portraitAvatar} />
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 flex items-center justify-between gap-3">
+          <Logo
+            variant={logoVariant}
+            portraitAvatar={portraitAvatar}
+            name={name}
+            role={role}
+          />
 
           <div className="flex items-center gap-3 md:gap-6">
             <Link
@@ -100,7 +121,12 @@ export default function Header({
         open={open}
         onClose={() => setOpen(false)}
         portraitAvatar={portraitAvatar}
-        settings={settings}
+        extraNavItems={extraNavItems}
+        fixedNavItems={fixedNavItems}
+        phone={phone}
+        phoneHref={phoneHref}
+        email={email}
+        emailHref={emailHref}
       />
     </>
   );

@@ -20,9 +20,10 @@ import {
   type ClosingInput,
 } from "@/app/admin/closings/actions";
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
+import { AiLoader } from "@/components/ui/ai-loader";
 import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
-import { AiLoader } from "@/components/ui/ai-loader";
 import { DEFAULT_CLOSING_PHOTO } from "@/lib/imageDefaults";
 
 export type ClosingRow = {
@@ -46,6 +47,7 @@ export default function ClosingsManager({
   library: LibraryItem[];
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [items, setItems] = useState<ClosingRow[]>(initial);
   const [editing, setEditing] = useState<ClosingRow | null>(null);
   const [adding, setAdding] = useState(false);
@@ -63,8 +65,14 @@ export default function ClosingsManager({
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm("Delete this closing?")) return;
+  async function handleDelete(id: string) {
+    const ok = await confirm({
+      title: "Delete this closing?",
+      body: "It will be removed from /closings and from the homepage gallery.",
+      confirmLabel: "Delete closing",
+      danger: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       await deleteClosing(id);
       setItems((prev) => prev.filter((x) => x.id !== id));
@@ -156,18 +164,21 @@ export default function ClosingsManager({
                       {c.city}
                       {c.state ? `, ${c.state}` : ""}
                     </p>
+                    {/* Edit (navy) is visually distinct from Delete (red)
+                        at rest, not just on hover — they were near-identical
+                        before. */}
                     <div className="mt-auto pt-3 flex items-center justify-between">
                       <button
                         type="button"
                         onClick={() => setEditing(c)}
-                        className="text-xs text-navy hover:underline"
+                        className="text-xs text-navy hover:underline inline-flex items-center min-h-[36px] px-2 -mx-2"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(c.id)}
-                        className="text-xs text-ink/55 hover:text-red-600 inline-flex items-center gap-1"
+                        className="text-xs text-red-600/85 hover:text-red-700 inline-flex items-center gap-1 min-h-[36px] px-2 -mx-2"
                       >
                         <Trash2 size={12} /> Delete
                       </button>
@@ -281,7 +292,7 @@ function ClosingDialog({
                 className="admin-input"
                 value={v.city}
                 onChange={(e) => set("city", e.target.value)}
-                placeholder="Woodbridge"
+                placeholder="Vienna"
               />
             </div>
             <div>

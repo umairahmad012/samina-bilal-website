@@ -10,7 +10,8 @@ import ParallaxScroll from "@/components/ParallaxScroll";
 import { getPortrait, getFeaturedImage } from "@/lib/contentLoader";
 import { getAnalyticsMeasurementId } from "@/lib/integrationStore";
 import { siteOrigin } from "@/lib/qrcode";
-import { getSiteSettings } from "@/lib/siteSettings";
+import { getSiteSettings, FIXED_NAV_HREF } from "@/lib/siteSettings";
+import { getNavPages } from "@/lib/customPages";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -62,11 +63,22 @@ export default async function RootLayout({
   // don't each re-fetch. When admin pastes a GA Measurement ID via
   // /admin/integrations/analytics, this becomes a string like "G-XXXX...";
   // when blank or disabled, GA scripts simply don't render.
-  const [portrait, gaMeasurementId, settings] = await Promise.all([
+  const [portrait, gaMeasurementId, navPages, settings] = await Promise.all([
     getPortrait(),
     getAnalyticsMeasurementId(),
+    getNavPages(),
     getSiteSettings(),
   ]);
+  // Build the full nav from the editable fixed_nav (enabled + ordered)
+  // followed by the custom pages flagged "Show in header nav".
+  const fixedNavItems = [...settings.fixedNav]
+    .filter((n) => n.enabled && FIXED_NAV_HREF[n.key])
+    .sort((a, b) => a.order - b.order)
+    .map((n) => ({ label: n.label, href: FIXED_NAV_HREF[n.key] }));
+  const extraNavItems = navPages.map((p) => ({
+    label: p.title,
+    href: `/${p.slug}`,
+  }));
 
   return (
     <html lang="en" className={montserrat.variable}>
@@ -100,7 +112,17 @@ export default async function RootLayout({
         {/* JS-driven parallax for .bg-parallax elements — works on
             iOS Safari where `background-attachment: fixed` doesn't. */}
         <ParallaxScroll />
-        <Header portraitAvatar={portrait.avatar} settings={settings} />
+        <Header
+          portraitAvatar={portrait.avatar}
+          fixedNavItems={fixedNavItems}
+          extraNavItems={extraNavItems}
+          name={settings.name}
+          role={settings.role}
+          phone={settings.phone}
+          phoneHref={settings.phoneHref}
+          email={settings.email}
+          emailHref={settings.emailHref}
+        />
         <main>{children}</main>
         <Footer portraitAvatar={portrait.avatar} settings={settings} />
       </body>

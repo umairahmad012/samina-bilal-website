@@ -27,6 +27,7 @@ import {
   type ReviewInput,
   type ReviewSource,
 } from "@/app/admin/reviews/actions";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import { cn } from "@/lib/cn";
 
 export type ReviewRow = {
@@ -79,6 +80,7 @@ export default function ReviewsManager({
   internalFeedback?: SubmissionRow[];
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [items, setItems] = useState<ReviewRow[]>(initial);
   const [editing, setEditing] = useState<ReviewRow | null>(null);
   const [adding, setAdding] = useState(false);
@@ -96,8 +98,14 @@ export default function ReviewsManager({
     });
   }
 
-  function handleDelete(id: string) {
-    if (!confirm("Delete this review?")) return;
+  async function handleDelete(id: string) {
+    const ok = await confirm({
+      title: "Delete this review?",
+      body: "It will disappear from /reviews and the homepage strip.",
+      confirmLabel: "Delete review",
+      danger: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       await deleteReview(id);
       setItems((prev) => prev.filter((x) => x.id !== id));
@@ -258,7 +266,7 @@ export default function ReviewsManager({
                       }
                       className="text-xs inline-flex items-center gap-1"
                       style={{ color: "var(--primary)", fontWeight: 600 }}
-                      title="Promote to public website (still won't post to Google)"
+                      aria-label="Promote to public website (still won't post to Google)" data-tooltip="Promote to public website (still won't post to Google)"
                     >
                       <Check size={13} /> Approve to website
                     </button>
@@ -594,23 +602,33 @@ function ReviewDialog({
             </div>
           </div>
           <div className="space-y-2">
-            <label className="inline-flex items-center gap-2">
+            <label
+              htmlFor="review-featured"
+              className="inline-flex items-center gap-2 cursor-pointer min-h-[36px]"
+            >
               <input
+                id="review-featured"
                 type="checkbox"
                 checked={v.is_featured_homepage}
                 onChange={(e) =>
                   set("is_featured_homepage", e.target.checked)
                 }
+                className="w-4 h-4 accent-navy cursor-pointer"
               />
               <span className="text-sm text-ink/75">
                 Feature on homepage strip
               </span>
             </label>
-            <label className="inline-flex items-center gap-2">
+            <label
+              htmlFor="review-visible"
+              className="inline-flex items-center gap-2 cursor-pointer min-h-[36px]"
+            >
               <input
+                id="review-visible"
                 type="checkbox"
                 checked={v.is_visible}
                 onChange={(e) => set("is_visible", e.target.checked)}
+                className="w-4 h-4 accent-navy cursor-pointer"
               />
               <span className="text-sm text-ink/75">Show on public site</span>
             </label>

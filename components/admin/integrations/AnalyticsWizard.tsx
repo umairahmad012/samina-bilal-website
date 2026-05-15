@@ -20,6 +20,7 @@ import {
   saveAnalyticsIntegration,
   disconnectAnalytics,
 } from "@/app/admin/integrations/analytics/actions";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import { AiLoader } from "@/components/ui/ai-loader";
 
 interface ExistingConfig {
@@ -33,6 +34,7 @@ export default function AnalyticsWizard({
   existing: ExistingConfig | null;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [pending, startTransition] = useTransition();
   const [measurementId, setMeasurementId] = useState(
     existing?.measurementId ?? "",
@@ -58,14 +60,13 @@ export default function AnalyticsWizard({
     });
   }
 
-  function handleDisconnect() {
-    if (
-      !confirm(
-        "Disconnect Google Analytics? The tag will be removed from every page and visitors will no longer be tracked. Your historical data stays in Google Analytics — only the tag is removed.",
-      )
-    ) {
-      return;
-    }
+  async function handleDisconnect() {
+    const ok = await confirm({
+      title: "Disconnect Google Analytics?",
+      body: "The tag will be removed from every page and visitors will no longer be tracked. Your historical data stays in Google Analytics — only the tag is removed.",
+      confirmLabel: "Disconnect",
+    });
+    if (!ok) return;
     startTransition(async () => {
       const res = await disconnectAnalytics();
       if (!res.ok) {
@@ -249,7 +250,7 @@ export default function AnalyticsWizard({
             disabled={!measurementId}
             className="admin-btn"
           >
-            Save & install
+            Save &amp; install
           </button>
         )}
 

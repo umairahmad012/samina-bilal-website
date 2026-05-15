@@ -3,28 +3,59 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import { nav, site as staticSite } from "@/lib/site";
-import type { SiteSettings } from "@/lib/siteSettings";
+import { nav, site } from "@/lib/site";
 
 export default function MenuDrawer({
   open,
   onClose,
   portraitAvatar,
-  settings,
+  extraNavItems,
+  fixedNavItems,
+  phone,
+  phoneHref,
+  email,
+  emailHref,
 }: {
   open: boolean;
   onClose: () => void;
   portraitAvatar?: string;
-  settings?: SiteSettings;
+  extraNavItems?: Array<{ label: string; href: string }>;
+  fixedNavItems?: Array<{ label: string; href: string }>;
+  phone?: string;
+  phoneHref?: string;
+  email?: string;
+  emailHref?: string;
 }) {
-  // Prefer admin-edited settings; fall back to compile-time defaults.
-  const site = {
-    phone: settings?.phone || staticSite.phone,
-    phoneHref: settings?.phoneHref || staticSite.phoneHref,
-    email: settings?.email || staticSite.email,
-    emailHref: settings?.emailHref || staticSite.emailHref,
-    portrait: settings?.portrait ?? staticSite.portrait,
+  // Three-tier nav assembly:
+  //   1) Fixed nav from site_settings (enabled + ordered) — if provided
+  //   2) Otherwise fall back to the hardcoded `nav` array in lib/site.ts
+  //   3) Inject custom-page nav items (extraNavItems) before /contact
+  type NavItem = {
+    label: string;
+    href: string;
+    children?: { label: string; href: string }[];
   };
+  const baseNav: NavItem[] =
+    fixedNavItems && fixedNavItems.length > 0
+      ? // Re-attach Communities sub-children when present in the original nav
+        fixedNavItems.map((item) => {
+          const orig = (nav as NavItem[]).find((n) => n.href === item.href);
+          return orig?.children
+            ? { ...item, children: orig.children }
+            : item;
+        })
+      : (nav as NavItem[]);
+
+  const mergedNav: NavItem[] = (() => {
+    if (!extraNavItems || extraNavItems.length === 0) return baseNav;
+    const idx = baseNav.findIndex((n) => n.href === "/contact");
+    const safeIdx = idx === -1 ? baseNav.length : idx;
+    return [
+      ...baseNav.slice(0, safeIdx),
+      ...extraNavItems.map((e) => ({ label: e.label, href: e.href })),
+      ...baseNav.slice(safeIdx),
+    ];
+  })();
   const avatar = portraitAvatar || site.portrait.avatar;
   useEffect(() => {
     function onEsc(e: KeyboardEvent) {
@@ -85,13 +116,13 @@ export default function MenuDrawer({
             Samina&nbsp;Bilal
           </span>
           <span className="mt-1.5 text-[0.6rem] tracking-[0.4em] uppercase text-white/55">
-            Realtor
+            Real Estate Specialist
           </span>
         </div>
 
         {/* Nav */}
         <nav className="px-10 md:px-14 pb-12 overflow-y-auto" style={{ maxHeight: "calc(100vh - 240px)" }}>
-          {nav.map((item) => (
+          {mergedNav.map((item) => (
             <div key={item.href} className="border-b border-white/10 last:border-0">
               <Link
                 href={item.href}
@@ -124,11 +155,11 @@ export default function MenuDrawer({
             <p className="tracking-wider uppercase text-[0.7rem] opacity-70 mb-3">
               Direct
             </p>
-            <a href={site.phoneHref} className="block hover:opacity-100">
-              {site.phone}
+            <a href={phoneHref || site.phoneHref} className="block hover:opacity-100">
+              {phone || site.phone}
             </a>
-            <a href={site.emailHref} className="block hover:opacity-100">
-              {site.email}
+            <a href={emailHref || site.emailHref} className="block hover:opacity-100">
+              {email || site.email}
             </a>
           </div>
         </nav>

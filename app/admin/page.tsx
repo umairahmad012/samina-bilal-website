@@ -4,6 +4,9 @@ import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import AdminCard from "@/components/admin/AdminCard";
 import {
   FileText,
+  Layers,
+  LayoutTemplate,
+  SlidersHorizontal,
   Image as ImageIcon,
   Home as HomeIcon,
   Star,
@@ -42,10 +45,40 @@ const editorSections: Array<{
     variant: "palette",
   },
   {
+    href: "/admin/builder/home",
+    icon: Layers,
+    title: "Page Builder",
+    description:
+      "Add, reorder, hide, edit, duplicate, or remove sections on every page. Background image or YouTube video on any block.",
+    accent: "#2e5d32",
+    badge: "Sections",
+    variant: "lines",
+  },
+  {
+    href: "/admin/pages",
+    icon: LayoutTemplate,
+    title: "Custom Pages",
+    description:
+      "Create new pages — landing pages, market reports, neighborhood deep-dives. Each lives at /your-slug.",
+    accent: "#5b7c4a",
+    badge: "Pages",
+    variant: "lines",
+  },
+  {
+    href: "/admin/settings",
+    icon: SlidersHorizontal,
+    title: "Site Settings",
+    description:
+      "Phone, email, social URLs, licenses, header navigation, and per-page SEO metadata.",
+    accent: "#3e6b3e",
+    badge: "Settings",
+    variant: "lines",
+  },
+  {
     href: "/admin/content",
     icon: FileText,
-    title: "Content",
-    description: "Headings, paragraphs, CTAs across every page.",
+    title: "Content (legacy)",
+    description: "Original per-section editor. Page Builder is the new way; this is kept for any sections not yet migrated.",
     accent: "#5b7c4a",
     badge: "Copy",
     variant: "lines",

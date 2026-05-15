@@ -32,6 +32,7 @@ import {
   ExternalLink,
   BarChart3,
   Search,
+  Layers,
 } from "lucide-react";
 import NextImage from "next/image";
 import { createClient } from "@/lib/supabase/client";
@@ -39,7 +40,14 @@ import { useAdminLayout } from "@/components/admin/AdminLayoutProvider";
 
 type NavGroup = {
   label: string;
-  items: { href: string; label: string; icon: typeof LayoutTemplate; matchPrefix?: boolean }[];
+  items: {
+    href: string;
+    label: string;
+    icon: typeof LayoutTemplate;
+    matchPrefix?: boolean;
+    /** Show a "Beta" pill — indicates this feature is partial/in-progress. */
+    beta?: boolean;
+  }[];
 };
 
 const NAV_GROUPS: NavGroup[] = [
@@ -47,6 +55,9 @@ const NAV_GROUPS: NavGroup[] = [
     label: "Site Editor",
     items: [
       { href: "/admin", label: "Dashboard", icon: LayoutTemplate },
+      { href: "/admin/builder/home", label: "Page Builder", icon: Layers, matchPrefix: true },
+      { href: "/admin/pages", label: "Custom Pages", icon: LayoutTemplate, matchPrefix: true },
+      { href: "/admin/settings", label: "Site Settings", icon: Plug, matchPrefix: true },
       { href: "/admin/brand", label: "Brand Identity", icon: Palette, matchPrefix: true },
       { href: "/admin/media", label: "Media Library", icon: ImageIcon, matchPrefix: true },
       { href: "/admin/reviews", label: "Reviews", icon: Star, matchPrefix: true },
@@ -55,8 +66,8 @@ const NAV_GROUPS: NavGroup[] = [
   {
     label: "Growth",
     items: [
-      { href: "/admin/analytics", label: "Analytics", icon: BarChart3, matchPrefix: true },
-      { href: "/admin/seo", label: "SEO", icon: Search, matchPrefix: true },
+      { href: "/admin/analytics", label: "Analytics", icon: BarChart3, matchPrefix: true, beta: true },
+      { href: "/admin/seo", label: "SEO", icon: Search, matchPrefix: true, beta: true },
     ],
   },
   {
@@ -186,7 +197,19 @@ export default function AdminSidebar({
                     }
                   >
                     <Icon size={15} strokeWidth={1.75} />
-                    {item.label}
+                    <span className="flex-1">{item.label}</span>
+                    {item.beta ? (
+                      <span
+                        className="text-[8.5px] tracking-[0.18em] uppercase px-1.5 py-0.5 rounded ml-auto"
+                        style={{
+                          background: "color-mix(in srgb, var(--primary) 14%, transparent)",
+                          color: "var(--primary)",
+                          fontWeight: 700,
+                        }}
+                      >
+                        Beta
+                      </span>
+                    ) : null}
                   </Link>
                 );
               })}
@@ -200,10 +223,14 @@ export default function AdminSidebar({
         className="p-3 space-y-2"
         style={{ borderTop: "1px solid var(--sidebar-border)" }}
       >
-        {/* Back to public site — opens marketing site in same tab so admin
-            can preview their changes without losing the admin session. */}
-        <Link
+        {/* View public site — opens in a NEW tab so the admin keeps
+            their place. The icon already implies external/new-tab; the
+            previous same-tab behavior felt broken because clicking
+            this dumped admins out of their workflow. */}
+        <a
           href="/"
+          target="_blank"
+          rel="noopener noreferrer"
           onClick={onClose}
           className="admin-tab w-full"
           style={{
@@ -212,8 +239,8 @@ export default function AdminSidebar({
           }}
         >
           <ExternalLink size={14} strokeWidth={1.75} />
-          Back to Site
-        </Link>
+          View Site
+        </a>
 
         <div
           className="px-3 py-2 rounded text-[11px] truncate"

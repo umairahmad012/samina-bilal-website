@@ -27,6 +27,7 @@ import {
   type FormField,
   type FormFieldType,
 } from "@/lib/forms";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
 import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function FormBuilder({
@@ -37,6 +38,7 @@ export default function FormBuilder({
   initial: FormInput;
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [v, setV] = useState<FormInput>(initial);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -55,8 +57,14 @@ export default function FormBuilder({
     [next[i], next[j]] = [next[j], next[i]];
     set("fields", next);
   }
-  function removeField(i: number) {
-    if (!confirm("Delete this field?")) return;
+  async function removeField(i: number) {
+    const ok = await confirm({
+      title: "Delete this field?",
+      body: "The field will be removed from this form's builder. Already-collected submissions keep their values.",
+      confirmLabel: "Delete field",
+      danger: true,
+    });
+    if (!ok) return;
     set(
       "fields",
       v.fields.filter((_, idx) => idx !== i),
@@ -79,9 +87,15 @@ export default function FormBuilder({
     });
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!existingId) return;
-    if (!confirm(`Delete ${v.title || "this form"}? This can't be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete "${v.title || "this form"}"?`,
+      body: "This can't be undone. The form and all its collected submissions will be removed.",
+      confirmLabel: "Delete form",
+      danger: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       await deleteForm(existingId);
       router.push("/admin/forms");
@@ -303,7 +317,7 @@ export default function FormBuilder({
               className="admin-input"
               value={v.notify_email ?? ""}
               onChange={(e) => set("notify_email", e.target.value || null)}
-              placeholder="samina@example.com"
+              placeholder="name@example.com"
             />
           </div>
           <label className="inline-flex items-center gap-2">

@@ -10,11 +10,12 @@ import {
   type CommunityInput,
 } from "@/app/admin/communities/actions";
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
+import { useConfirm } from "@/components/admin/ConfirmDialog";
+import { AiLoader } from "@/components/ui/ai-loader";
 import {
   DEFAULT_COMMUNITY_PHOTO,
   DEFAULT_COMMUNITY_HERO_PHOTO,
 } from "@/lib/imageDefaults";
-import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function CommunityForm({
   existingId,
@@ -26,6 +27,7 @@ export default function CommunityForm({
   library: LibraryItem[];
 }) {
   const router = useRouter();
+  const confirm = useConfirm();
   const [v, setV] = useState<CommunityInput>(initial);
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +49,15 @@ export default function CommunityForm({
     });
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!existingId) return;
-    if (!confirm(`Delete ${v.name}? This can't be undone.`)) return;
+    const ok = await confirm({
+      title: `Delete "${v.name}"?`,
+      body: "This can't be undone. The community page will 404 and any block that references it will fall back to defaults.",
+      confirmLabel: "Delete community",
+      danger: true,
+    });
+    if (!ok) return;
     startTransition(async () => {
       const res = await deleteCommunity(existingId);
       if (!res.ok) {
@@ -228,8 +236,8 @@ export default function CommunityForm({
             <textarea
               rows={3}
               className="admin-input"
-              value={v.samina_quote}
-              onChange={(e) => set("samina_quote", e.target.value)}
+              value={v.agent_quote}
+              onChange={(e) => set("agent_quote", e.target.value)}
               placeholder="Pull-quote that appears next to the photo."
             />
           </div>
