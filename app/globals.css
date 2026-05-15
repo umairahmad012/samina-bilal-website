@@ -679,18 +679,20 @@ button:hover svg,
   to   { opacity: 0; }
 }
 
-/* Sticky parallax background — pins a full-bleed bg image while the
-   foreground scrolls. Respects the OS reduced-motion preference (a11y
-   signal) by falling back to scroll attachment for users who
-   have asked their device to minimize motion. */
+/* ============================================================
+   PARALLAX BACKGROUND (full-bleed hero / break sections)
+   ============================================================
+   Visual is driven by components/ParallaxScroll.tsx — it applies
+   a scroll-bound `translate3d(...)` on each `.bg-parallax`
+   element, giving a "the image is anchored, content scrolls over
+   it" feel that works on every device (iOS Safari ignores
+   `background-attachment: fixed` or blurs it through an off-screen
+   buffer).
+
+   The class itself only establishes the cover/center backdrop
+   baseline. JS picks it up from there. */
 .bg-parallax {
-  background-attachment: fixed;
   background-position: center center;
   background-size: cover;
   background-repeat: no-repeat;
-}
-@media (prefers-reduced-motion: reduce) {
-  .bg-parallax {
-    background-attachment: scroll;
-  }
 }
