@@ -31,7 +31,7 @@ export default async function CommunitiesPage() {
       crop: "wide",
       width: 1920,
     }),
-    resolveImageUrl(c.darkBreak.backgroundImage, {
+    resolveImageUrl(c.darkBreak?.backgroundImage, {
       fallback:
         "/images/Light%20Sburban/Gemini_Generated_Image_cln91tcln91tcln9.png",
       crop: "wide",
@@ -153,9 +153,9 @@ export default async function CommunitiesPage() {
       {/* Dark break — separates the comparison table from the photo grid */}
       <DarkBreak
         bgImage={darkBreakBg}
-        eyebrow={c.darkBreak.eyebrow || "Six Neighborhoods, One Realtor"}
-        quote={c.darkBreak.quote || "Local matters."}
-        attribution={c.darkBreak.attribution}
+        eyebrow={c.darkBreak?.eyebrow || "Six Neighborhoods, One Realtor"}
+        quote={c.darkBreak?.quote || "Local matters."}
+        attribution={c.darkBreak?.attribution}
         height="md"
       />
 
