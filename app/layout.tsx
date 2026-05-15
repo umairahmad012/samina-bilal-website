@@ -96,7 +96,7 @@ export default async function RootLayout({
         {/* Fullscreen gold-on-dark overlay on every route change.
             Self-hides inside /admin so editing isn't interrupted. */}
         <PageTransitionLoader />
-        <Header portraitAvatar={portrait.avatar} />
+        <Header portraitAvatar={portrait.avatar} settings={settings} />
         <main>{children}</main>
         <Footer portraitAvatar={portrait.avatar} settings={settings} />
       </body>

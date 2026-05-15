@@ -3,17 +3,28 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import { nav, site } from "@/lib/site";
+import { nav, site as staticSite } from "@/lib/site";
+import type { SiteSettings } from "@/lib/siteSettings";
 
 export default function MenuDrawer({
   open,
   onClose,
   portraitAvatar,
+  settings,
 }: {
   open: boolean;
   onClose: () => void;
   portraitAvatar?: string;
+  settings?: SiteSettings;
 }) {
+  // Prefer admin-edited settings; fall back to compile-time defaults.
+  const site = {
+    phone: settings?.phone || staticSite.phone,
+    phoneHref: settings?.phoneHref || staticSite.phoneHref,
+    email: settings?.email || staticSite.email,
+    emailHref: settings?.emailHref || staticSite.emailHref,
+    portrait: settings?.portrait ?? staticSite.portrait,
+  };
   const avatar = portraitAvatar || site.portrait.avatar;
   useEffect(() => {
     function onEsc(e: KeyboardEvent) {

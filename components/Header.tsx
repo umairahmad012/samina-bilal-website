@@ -6,11 +6,15 @@ import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import Logo from "./Logo";
 import MenuDrawer from "./MenuDrawer";
+import type { SiteSettings } from "@/lib/siteSettings";
 
 export default function Header({
   portraitAvatar,
+  settings,
 }: {
   portraitAvatar?: string;
+  /** Forwarded to MenuDrawer for DB-backed phone/email/avatar. */
+  settings?: SiteSettings;
 }) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
@@ -96,6 +100,7 @@ export default function Header({
         open={open}
         onClose={() => setOpen(false)}
         portraitAvatar={portraitAvatar}
+        settings={settings}
       />
     </>
   );
