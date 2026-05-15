@@ -1,5 +1,6 @@
 import { Phone, Mail, MapPin, Clock, Instagram, Facebook, Music2 } from "lucide-react";
-import { site } from "@/lib/site";
+import { site as staticSite } from "@/lib/site";
+import { getSiteSettings } from "@/lib/siteSettings";
 import ShimmerText from "@/components/ShimmerText";
 import ContactForm from "@/components/ContactForm";
 import { getPageContent, resolveImageUrl } from "@/lib/contentLoader";
@@ -25,6 +26,20 @@ type ContactContent = {
 
 export default async function ContactPage() {
   const c = await getPageContent<ContactContent>("contact");
+  const settings = await getSiteSettings();
+  // Merge admin-edited values over static defaults for every read below.
+  const site = {
+    phone: settings.phone || staticSite.phone,
+    phoneHref: settings.phoneHref || staticSite.phoneHref,
+    email: settings.email || staticSite.email,
+    emailHref: settings.emailHref || staticSite.emailHref,
+    office: settings.office ?? staticSite.office,
+    social: {
+      instagram: settings.social.instagram || staticSite.social.instagram,
+      facebook: settings.social.facebook || staticSite.social.facebook,
+      tiktok: settings.social.tiktok || staticSite.social.tiktok,
+    },
+  };
   const heroBg = await resolveImageUrl(c.hero.backgroundImage, {
     fallback:
       "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85",
