@@ -73,7 +73,7 @@ const DEFAULT_FOOTER_COPY = {
   credit: "Site by Brand Bonjour",
   newsletterHeadline: "Newsletter",
   newsletterBlurb:
-    "Quarterly market reports for the DMV — Virginia, Maryland & D.C. New listings, sold prices, and what it means for your zip code. No spam, ever.",
+    "Quarterly market reports for Northern Virginia and Maryland. New listings, sold prices, and what it means for your zip code. No spam, ever.",
 };
 
 /** Default fixed-nav order matching the hardcoded `nav` array shape. */
@@ -82,7 +82,7 @@ const DEFAULT_FIXED_NAV: NavEntry[] = [
   { key: "about", label: "About", enabled: true, order: 20 },
   { key: "buyers", label: "Buyers", enabled: true, order: 30 },
   { key: "sellers", label: "Sellers", enabled: true, order: 40 },
-  { key: "invest", label: "Invest", enabled: true, order: 50 },
+  { key: "path-to-ownership", label: "Path to Ownership", enabled: true, order: 50 },
   { key: "communities", label: "Communities", enabled: true, order: 60 },
   { key: "closings", label: "Recent Closings", enabled: true, order: 70 },
   { key: "partners", label: "Trusted Partners", enabled: true, order: 80 },
@@ -99,7 +99,7 @@ export const FIXED_NAV_HREF: Record<string, string> = {
   about: "/about",
   buyers: "/buyers",
   sellers: "/sellers",
-  invest: "/invest",
+  "path-to-ownership": "/path-to-ownership",
   communities: "/communities",
   closings: "/closings",
   partners: "/partners",
