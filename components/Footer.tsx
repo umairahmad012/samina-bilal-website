@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Instagram, Facebook, Music2 } from "lucide-react";
+import { Instagram, Facebook, Music2, Phone, Mail, MapPin } from "lucide-react";
 import { site as staticSite } from "@/lib/site";
 import type { SiteSettings } from "@/lib/siteSettings";
 
@@ -78,15 +78,22 @@ export default function Footer({
           >
             Direct
           </p>
-          <p className="text-base font-light leading-[1.85]">
-            <a href={site.phoneHref} className="hover:opacity-70 transition-opacity">
+          <div className="text-base font-light leading-[1.85] space-y-2">
+            <a
+              href={site.phoneHref}
+              className="inline-flex items-center gap-2.5 hover:opacity-70 transition-opacity"
+            >
+              <Phone size={15} strokeWidth={1.5} className="opacity-70" />
               {site.phone}
             </a>
-            <br />
-            <a href={site.emailHref} className="hover:opacity-70 transition-opacity">
+            <a
+              href={site.emailHref}
+              className="flex items-center gap-2.5 hover:opacity-70 transition-opacity"
+            >
+              <Mail size={15} strokeWidth={1.5} className="opacity-70" />
               {site.email}
             </a>
-          </p>
+          </div>
 
           {/* Brokerage card — info + large RE/MAX Galaxy logo at the end */}
           <div className="mt-10 pt-6 border-t border-white/10">
@@ -96,20 +103,24 @@ export default function Footer({
             >
               Brokerage Office
             </p>
-            <p
-              className="text-sm font-light text-white/90 leading-[1.75] mb-2"
+            <div
+              className="text-sm font-light text-white/90 leading-[1.75] mb-2 flex items-start gap-2.5"
               style={{ fontWeight: 300 }}
             >
-              {bo.name}
-              <br />
-              {bo.street}
-              <br />
-              {bo.cityStateZip}
-            </p>
+              <MapPin size={15} strokeWidth={1.5} className="mt-1 shrink-0 opacity-70" />
+              <span>
+                {bo.name}
+                <br />
+                {bo.street}
+                <br />
+                {bo.cityStateZip}
+              </span>
+            </div>
             <a
               href={bo.phoneHref}
-              className="text-sm font-light text-white/85 hover:opacity-70 transition-opacity"
+              className="text-sm font-light text-white/85 hover:opacity-70 transition-opacity inline-flex items-center gap-2.5"
             >
+              <Phone size={14} strokeWidth={1.5} className="opacity-70" />
               {bo.phone}
             </a>
 
