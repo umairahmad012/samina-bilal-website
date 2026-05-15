@@ -22,6 +22,7 @@ import {
 import ImagePicker, { type LibraryItem } from "@/components/admin/media/ImagePicker";
 import type { CropArea } from "@/components/admin/media/CropEditor";
 import { cldUrl } from "@/lib/cloudinary";
+import { AiLoader } from "@/components/ui/ai-loader";
 import { DEFAULT_CLOSING_PHOTO } from "@/lib/imageDefaults";
 
 export type ClosingRow = {
@@ -321,14 +322,14 @@ function ClosingDialog({
           <button onClick={onClose} className="admin-btn admin-btn-secondary">
             Cancel
           </button>
-          <button
-            onClick={save}
-            disabled={pending}
-            className="admin-btn"
-          >
-            <Save size={14} className="mr-2" />
-            Save
-          </button>
+          {pending ? (
+            <AiLoader text="Saving" />
+          ) : (
+            <button onClick={save} className="admin-btn">
+              <Save size={14} className="mr-2" />
+              Save
+            </button>
+          )}
         </div>
       </div>
     </div>

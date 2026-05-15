@@ -27,6 +27,7 @@ import {
   type FormField,
   type FormFieldType,
 } from "@/lib/forms";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function FormBuilder({
   existingId,
@@ -344,14 +345,18 @@ export default function FormBuilder({
           >
             Cancel
           </Link>
-          <button
-            type="button"
-            onClick={save}
-            disabled={pending || !v.title || !v.slug}
-            className="admin-btn"
-          >
-            <Save size={14} className="mr-2" /> Save
-          </button>
+          {pending ? (
+            <AiLoader text="Saving" />
+          ) : (
+            <button
+              type="button"
+              onClick={save}
+              disabled={!v.title || !v.slug}
+              className="admin-btn"
+            >
+              <Save size={14} className="mr-2" /> Save
+            </button>
+          )}
         </div>
       </div>
 

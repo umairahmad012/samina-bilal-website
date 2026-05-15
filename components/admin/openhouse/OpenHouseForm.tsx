@@ -20,6 +20,7 @@ import {
   countWords,
   clampToWords,
 } from "@/lib/openHouseFeatures";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function OpenHouseForm({
   existingId,
@@ -567,14 +568,18 @@ export default function OpenHouseForm({
           >
             Cancel
           </Link>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={pending || !v.heading || !v.slug}
-            className="admin-btn"
-          >
-            <Save size={14} className="mr-2" /> Save
-          </button>
+          {pending ? (
+            <AiLoader text="Saving" />
+          ) : (
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!v.heading || !v.slug}
+              className="admin-btn"
+            >
+              <Save size={14} className="mr-2" /> Save
+            </button>
+          )}
         </div>
       </div>
     </div>

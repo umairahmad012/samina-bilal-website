@@ -32,6 +32,7 @@ import {
   DEFAULT_PARTNER_PHOTO,
   DEFAULT_PARTNER_LOGO,
 } from "@/lib/imageDefaults";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 export type CategoryRow = {
   id: string;
@@ -610,9 +611,13 @@ function Footer({
       <button onClick={onClose} className="admin-btn admin-btn-secondary">
         Cancel
       </button>
-      <button onClick={onSave} disabled={pending} className="admin-btn">
-        <Save size={14} className="mr-2" /> Save
-      </button>
+      {pending ? (
+        <AiLoader text="Saving" />
+      ) : (
+        <button onClick={onSave} className="admin-btn">
+          <Save size={14} className="mr-2" /> Save
+        </button>
+      )}
     </div>
   );
 }

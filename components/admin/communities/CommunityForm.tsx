@@ -14,6 +14,7 @@ import {
   DEFAULT_COMMUNITY_PHOTO,
   DEFAULT_COMMUNITY_HERO_PHOTO,
 } from "@/lib/imageDefaults";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function CommunityForm({
   existingId,
@@ -436,14 +437,18 @@ export default function CommunityForm({
           >
             Cancel
           </Link>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={pending || !v.name || !v.slug}
-            className="admin-btn"
-          >
-            <Save size={14} className="mr-2" /> Save
-          </button>
+          {pending ? (
+            <AiLoader text="Saving" />
+          ) : (
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={!v.name || !v.slug}
+              className="admin-btn"
+            >
+              <Save size={14} className="mr-2" /> Save
+            </button>
+          )}
         </div>
       </div>
     </div>

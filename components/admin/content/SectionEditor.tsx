@@ -8,6 +8,7 @@ import type { SectionDef } from "@/lib/contentRegistry";
 import { FieldRenderer, MediaLibraryProvider } from "./Fields";
 import type { VideoLibraryItem } from "@/components/admin/media/VideoPicker";
 import { saveSection } from "@/app/admin/content/actions";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 export default function SectionEditor({
   section,
@@ -119,14 +120,17 @@ export default function SectionEditor({
           >
             <RotateCcw size={13} /> Reset
           </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={pending}
-            className="admin-btn"
-          >
-            <Save size={14} className="mr-2" /> Save
-          </button>
+          {pending ? (
+            <AiLoader text="Saving" />
+          ) : (
+            <button
+              type="button"
+              onClick={handleSave}
+              className="admin-btn"
+            >
+              <Save size={14} className="mr-2" /> Save
+            </button>
+          )}
         </div>
       </div>
     </div>

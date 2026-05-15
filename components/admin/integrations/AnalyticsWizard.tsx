@@ -20,6 +20,7 @@ import {
   saveAnalyticsIntegration,
   disconnectAnalytics,
 } from "@/app/admin/integrations/analytics/actions";
+import { AiLoader } from "@/components/ui/ai-loader";
 
 interface ExistingConfig {
   measurementId: string;
@@ -239,14 +240,18 @@ export default function AnalyticsWizard({
           dashboards in Google Analytics populate within ~24 hours of first
           traffic.
         </p>
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={pending || !measurementId}
-          className="admin-btn"
-        >
-          {pending ? "Saving…" : "Save & install"}
-        </button>
+        {pending ? (
+          <AiLoader text="Saving" />
+        ) : (
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={!measurementId}
+            className="admin-btn"
+          >
+            Save & install
+          </button>
+        )}
 
         {error && (
           <p
