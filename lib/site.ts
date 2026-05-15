@@ -3,6 +3,9 @@
 
 export const site = {
   name: "Samina Bilal",
+  role: "Real Estate Specialist",
+  serviceArea: "Northern Virginia · Maryland",
+  languages: ["English", "Urdu"],
   tagline: "Make Yourself at Home",
   brokerage: "RE/MAX Galaxy",
   phone: "(703) 973-7036",

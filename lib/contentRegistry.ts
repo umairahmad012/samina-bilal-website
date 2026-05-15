@@ -21,10 +21,32 @@ import { content as defaults } from "./content";
 // =============================================================================
 
 export type Field =
-  | { type: "text"; label: string; placeholder?: string; help?: string }
-  | { type: "paragraph"; label: string; placeholder?: string; help?: string; rows?: number }
+  | { type: "text"; label: string; placeholder?: string; help?: string; colorable?: boolean }
+  | {
+      type: "paragraph";
+      label: string;
+      placeholder?: string;
+      help?: string;
+      rows?: number;
+      colorable?: boolean;
+    }
   | { type: "url"; label: string; placeholder?: string; help?: string }
-  | { type: "list"; label: string; itemType: "text" | "paragraph"; help?: string }
+  | {
+      /** Dropdown picker — value is one of the option strings. */
+      type: "select";
+      label: string;
+      help?: string;
+      options: Array<{ value: string; label: string }>;
+    }
+  | { type: "boolean"; label: string; help?: string }
+  | {
+      type: "list";
+      label: string;
+      itemType: "text" | "paragraph";
+      help?: string;
+      /** When true, each list item gets its own color picker. */
+      colorable?: boolean;
+    }
   | { type: "object"; label: string; help?: string; shape: Record<string, Field> }
   | {
       type: "array";
