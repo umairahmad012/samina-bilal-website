@@ -78,7 +78,7 @@ export default function AdminForgotPasswordForm() {
         </Link>
         <h1
           className="text-2xl mb-2 text-ink"
-          style={{ fontWeight: 300, letterSpacing: "0.06em" }}
+          style={{ fontWeight: 600, letterSpacing: "0.01em" }}
         >
           Reset password
         </h1>

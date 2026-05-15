@@ -9,10 +9,36 @@
   --section-y-lg: clamp(5rem, 14vw, 14rem); /* mobile 80 → desktop 224 */
   /* Horizontal gutter — guarantees breathing room on phone */
   --gutter-x: clamp(1.5rem, 5vw, 4rem);     /* mobile 24 → desktop 64 */
+
+  /* ──────────────── BRAND THEME ────────────────
+     RGB triplets so Tailwind's <alpha-value> opacity modifier still works
+     (bg-navy/95 etc.). Defaults match the original editorial palette:
+       primary  = rgb(var(--brand-primary-rgb)) (navy)
+       surface  = #F2EFEA (cream)
+     The admin Brand Identity → Theme editor overrides these at runtime
+     via a <style> tag injected by <BrandThemeStyle> in app/layout.tsx. */
+  --brand-primary-rgb: 20 40 64;
+  --brand-primary-dark-rgb: 14 28 48;
+  --brand-primary-light-rgb: 37 64 106;
+  --brand-surface-rgb: 242 239 234;
+  --brand-surface-soft-rgb: 237 233 226;
+
+  /* Optional gradient overlays — when set, layered ON TOP of the solid
+     bg-navy / bg-cream color so the same Tailwind classes "just work"
+     for both flat colors and gradients. Default is `none` (no overlay). */
+  --brand-primary-gradient: none;
+  --brand-surface-gradient: none;
 }
 
+/* Gradient overlay rules — when --brand-primary-gradient is set to a
+   linear-gradient() string by the theme editor, every .bg-navy class
+   site-wide picks it up automatically. The solid color stays as the
+   background-color fallback in case the gradient fails to render. */
+.bg-navy { background-image: var(--brand-primary-gradient, none); }
+.bg-cream { background-image: var(--brand-surface-gradient, none); }
+
 html, body {
-  background: #F2EFEA;
+  background: rgb(var(--brand-surface-rgb));
   color: rgba(0, 0, 0, 0.78);
   font-family: var(--font-montserrat);
   font-weight: 300;
@@ -148,7 +174,7 @@ button {
 }
 .btn-outline-light:hover {
   background: rgba(255, 255, 255, 0.98);
-  color: #142840;
+  color: rgb(var(--brand-primary-rgb));
   border-color: rgba(255, 255, 255, 0.98);
   letter-spacing: 0.32em;
 }
@@ -158,8 +184,8 @@ button {
   align-items: center;
   justify-content: center;
   padding: 1.2rem 2.6rem;
-  border: 1px solid #142840;
-  color: #142840;
+  border: 1px solid rgb(var(--brand-primary-rgb));
+  color: rgb(var(--brand-primary-rgb));
   font-weight: 300;
   letter-spacing: 0.28em;
   font-size: 0.72rem;
@@ -169,7 +195,7 @@ button {
   white-space: nowrap;
 }
 .btn-outline-dark:hover {
-  background: #142840;
+  background: rgb(var(--brand-primary-rgb));
   color: white;
   letter-spacing: 0.32em;
 }
@@ -179,19 +205,19 @@ button {
   align-items: center;
   justify-content: center;
   padding: 1.2rem 2.6rem;
-  background: #142840;
+  background: rgb(var(--brand-primary-rgb));
   color: white;
   font-weight: 300;
   letter-spacing: 0.28em;
   font-size: 0.72rem;
   text-transform: uppercase;
   transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  border: 1px solid #142840;
+  border: 1px solid rgb(var(--brand-primary-rgb));
   white-space: nowrap;
 }
 .btn-solid:hover {
-  background: #0E1C30;
-  border-color: #0E1C30;
+  background: rgb(var(--brand-primary-dark-rgb));
+  border-color: rgb(var(--brand-primary-dark-rgb));
   letter-spacing: 0.32em;
 }
 
@@ -216,7 +242,7 @@ button {
 }
 .btn-glass:hover {
   background: rgba(255, 255, 255, 0.98);
-  color: #142840;
+  color: rgb(var(--brand-primary-rgb));
   border-color: rgba(255, 255, 255, 0.98);
   letter-spacing: 0.32em;
 }

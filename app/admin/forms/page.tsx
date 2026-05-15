@@ -29,7 +29,7 @@ export default async function FormsAdminPage() {
             </p>
             <h1
               className="text-2xl md:text-3xl text-ink mb-2"
-              style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+              style={{ fontWeight: 600, letterSpacing: "0.01em" }}
             >
               Form Builder
             </h1>

@@ -1,10 +1,14 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Plus, Eye, EyeOff, Pencil } from "lucide-react";
+import { ArrowLeft, Plus, Eye, EyeOff, Pencil, Image as ImageIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import AdminShell from "@/components/admin/AdminShell";
 import { cldUrl } from "@/lib/cloudinary";
 import SeedDefaultsButton from "@/components/admin/communities/SeedDefaultsButton";
+import { communities as staticCommunities } from "@/lib/communities";
+import { DEFAULT_COMMUNITY_PHOTO } from "@/lib/imageDefaults";
+
+const STATIC_BY_SLUG = new Map(staticCommunities.map((c) => [c.slug, c]));
 
 export default async function CommunitiesAdminPage() {
   const supabase = await createClient();
@@ -44,7 +48,7 @@ export default async function CommunitiesAdminPage() {
             </p>
             <h1
               className="text-2xl md:text-3xl text-ink mb-2"
-              style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+              style={{ fontWeight: 600, letterSpacing: "0.01em" }}
             >
               Neighborhoods.
             </h1>
@@ -72,23 +76,39 @@ export default async function CommunitiesAdminPage() {
           <div className="space-y-2">
             {items.map((c) => {
               const media = (c as unknown as { media?: { cloudinary_public_id?: string | null; url?: string } | null }).media;
+              const fallback =
+                STATIC_BY_SLUG.get(c.slug as string)?.image ?? DEFAULT_COMMUNITY_PHOTO;
               const thumb = media?.cloudinary_public_id
                 ? cldUrl(media.cloudinary_public_id, { crop: "wide", width: 280 })
-                : media?.url ?? null;
+                : media?.url || fallback;
+              const usingFallback = !media;
               return (
                 <Link
                   key={c.id as string}
                   href={`/admin/communities/${c.slug}`}
                   className="admin-card group p-4 flex items-center gap-4 hover:border-navy/30 transition-colors"
                 >
-                  <div className="w-24 h-16 rounded bg-black/5 overflow-hidden shrink-0">
-                    {thumb && (
+                  <div className="relative w-24 h-16 rounded bg-black/5 overflow-hidden shrink-0">
+                    {thumb ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={thumb}
                         alt={c.name as string}
                         className="w-full h-full object-cover"
                       />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-ink/30">
+                        <ImageIcon size={18} strokeWidth={1.25} />
+                      </div>
+                    )}
+                    {usingFallback && (
+                      <span
+                        className="absolute bottom-0 left-0 right-0 bg-amber-50/95 text-amber-800 text-[8px] uppercase tracking-[0.16em] py-0.5 text-center"
+                        style={{ fontWeight: 600 }}
+                        title="No photo picked yet — showing default"
+                      >
+                        default
+                      </span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">

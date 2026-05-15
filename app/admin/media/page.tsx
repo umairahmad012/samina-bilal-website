@@ -5,9 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import AdminShell from "@/components/admin/AdminShell";
 import MediaUploader from "@/components/admin/media/MediaUploader";
 import YouTubeAdder from "@/components/admin/media/YouTubeAdder";
-import MediaCard, {
-  type MediaRow,
-} from "@/components/admin/media/MediaCard";
+import MediaUsageBar from "@/components/admin/media/MediaUsageBar";
+import MediaUpgradeBanner from "@/components/admin/media/MediaUpgradeBanner";
+import MediaLibraryClient from "@/components/admin/media/MediaLibraryClient";
+import { type MediaRow } from "@/components/admin/media/MediaCard";
+import { getCloudinaryUsage } from "@/lib/cloudinaryAdmin";
 
 export default async function MediaPage() {
   const supabase = await createClient();
@@ -16,12 +18,15 @@ export default async function MediaPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
 
-  const { data: media } = await supabase
-    .from("media")
-    .select(
-      "id,kind,cloudinary_public_id,url,alt,width,height,uploaded_at",
-    )
-    .order("uploaded_at", { ascending: false });
+  const [{ data: media }, usage] = await Promise.all([
+    supabase
+      .from("media")
+      .select(
+        "id,kind,cloudinary_public_id,url,alt,width,height,uploaded_at",
+      )
+      .order("uploaded_at", { ascending: false }),
+    getCloudinaryUsage(),
+  ]);
 
   const items = (media ?? []) as MediaRow[];
 
@@ -43,7 +48,7 @@ export default async function MediaPage() {
         </p>
         <h1
           className="text-2xl md:text-3xl text-ink mb-2"
-          style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+          style={{ fontWeight: 600, letterSpacing: "0.01em" }}
         >
           Images & video.
         </h1>
@@ -53,6 +58,12 @@ export default async function MediaPage() {
           file is always kept intact. YouTube clips can be added as muted,
           looping background videos.
         </p>
+
+        {/* Storage tracker */}
+        <MediaUsageBar usage={usage} />
+
+        {/* Upgrade prompt — appears at 70%+ of plan capacity */}
+        <MediaUpgradeBanner usage={usage} />
 
         {/* Upload + YouTube adder */}
         <div className="grid md:grid-cols-2 gap-4 mb-10">
@@ -68,18 +79,7 @@ export default async function MediaPage() {
             </p>
           </div>
         ) : (
-          <>
-            <div className="flex items-center justify-between mb-4">
-              <p className="text-xs text-ink/55 tracking-[0.18em] uppercase">
-                Library · {items.length} item{items.length === 1 ? "" : "s"}
-              </p>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {items.map((m) => (
-                <MediaCard key={m.id} media={m} />
-              ))}
-            </div>
-          </>
+          <MediaLibraryClient items={items} />
         )}
       </div>
     </AdminShell>

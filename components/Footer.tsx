@@ -14,10 +14,11 @@ export default function Footer({
   const bo = site.brokerageOffice;
   const avatar = portraitAvatar || site.portrait.avatar;
 
-  // Hide marketing footer inside the admin panel + on standalone pages
+  // Hide marketing footer inside the admin panel + on standalone form
+  // pages. Open-house pages SHOW the footer on the web view; the
+  // @media print rules on /open-house/[slug] hide it during print.
   if (
     pathname?.startsWith("/admin") ||
-    pathname?.startsWith("/open-house") ||
     pathname?.startsWith("/leave-review") ||
     pathname?.startsWith("/form/")
   )

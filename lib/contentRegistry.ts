@@ -47,6 +47,10 @@ export type Field =
        *  the page's current hardcoded fallback so admins see what they're
        *  about to replace. */
       fallback?: string;
+      /** Cosmetic shape for the picker preview. "circle" frames the preview
+       *  in a round mask (used for favicons and avatars) so it looks like the
+       *  thing it'll become. */
+      previewShape?: "rect" | "circle";
     }
   | {
       /** Pick a YouTube video from the Media Library. Used for muted-loop
@@ -258,15 +262,66 @@ export const SECTIONS: SectionDef[] = [
   {
     page: "brand",
     key: "portrait",
-    label: "Headshot / Portrait",
+    label: "Realtor Image",
     description:
-      "The photo of you used site-wide — header avatar, footer, homepage intro, About page hero and bio. One picker, used in 6 places.",
+      "Your headshot — used as header avatar, footer, homepage intro, About page hero and bio. One picker, used in 6 places.",
     shape: {
       portrait: {
         type: "image",
-        label: "Portrait",
+        label: "Realtor Image",
         crop: "portrait",
         help: "Best aspect ratio is 3:4 (vertical). The crop preset adapts automatically per location.",
+        fallback: "/images/Samina%20Headshot.jpeg",
+      },
+    },
+  },
+  {
+    page: "brand",
+    key: "brokerLogo",
+    label: "Broker Image",
+    description:
+      "Your brokerage logo — shown on the open-house flyer header band and anywhere the brokerage is identified. Transparent PNG looks cleanest on the navy band.",
+    shape: {
+      logo: {
+        type: "image",
+        label: "Broker Logo",
+        crop: "free",
+        help: "Transparent PNG recommended.",
+        fallback: "/images/Remax%20Galaxy.png",
+      },
+    },
+  },
+  {
+    page: "brand",
+    key: "favicon",
+    label: "Favicon",
+    description:
+      "The small icon shown in browser tabs and bookmarks. Defaults to the realtor image — pick something simpler (a logo or initial) if you want a cleaner tab mark.",
+    shape: {
+      icon: {
+        type: "image",
+        label: "Favicon",
+        crop: "square",
+        previewShape: "circle",
+        help: "Square crop, shown in browser tabs as a circle.",
+        fallback: "/images/Samina%20Headshot.jpeg",
+      },
+    },
+  },
+  {
+    page: "brand",
+    key: "featuredImage",
+    label: "Site Featured Image",
+    description:
+      "The image shown when your site or a page is shared on social media (link previews on Facebook, Instagram, iMessage, etc.). Open-house listings use their hero photo automatically; this is the default everywhere else.",
+    shape: {
+      image: {
+        type: "image",
+        label: "Featured Image",
+        crop: "wide",
+        help: "Wide aspect (16:9 or 1.91:1). Used as the default OpenGraph share image.",
+        fallback:
+          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=85",
       },
     },
   },

@@ -35,7 +35,15 @@ const CROP_PRESETS: { key: CropPreset; label: string }[] = [
   { key: "wide", label: "16:9 Wide" },
 ];
 
-export default function MediaCard({ media }: { media: MediaRow }) {
+export default function MediaCard({
+  media,
+  selected,
+  onToggleSelected,
+}: {
+  media: MediaRow;
+  selected?: boolean;
+  onToggleSelected?: (id: string) => void;
+}) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
   const [editingAlt, setEditingAlt] = useState(false);
@@ -96,7 +104,12 @@ export default function MediaCard({ media }: { media: MediaRow }) {
   }
 
   return (
-    <div className="admin-card overflow-hidden flex flex-col">
+    <div
+      className={cn(
+        "admin-card overflow-hidden flex flex-col transition-shadow",
+        selected && "ring-2 ring-navy ring-offset-2 ring-offset-cream/20",
+      )}
+    >
       {/* Preview */}
       <div className="relative aspect-[4/3] bg-[repeating-conic-gradient(#0001_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] flex items-center justify-center">
         {previewSrc ? (
@@ -120,6 +133,22 @@ export default function MediaCard({ media }: { media: MediaRow }) {
             </>
           )}
         </div>
+        {onToggleSelected && (
+          <button
+            type="button"
+            onClick={() => onToggleSelected(media.id)}
+            className={cn(
+              "absolute top-2 right-2 w-6 h-6 rounded-md border flex items-center justify-center transition",
+              selected
+                ? "bg-navy border-navy text-white"
+                : "bg-white/90 border-black/15 text-transparent hover:border-navy/60 hover:text-navy/40",
+            )}
+            title={selected ? "Deselect" : "Select"}
+            aria-pressed={selected}
+          >
+            <Check size={14} />
+          </button>
+        )}
       </div>
 
       {/* Body */}

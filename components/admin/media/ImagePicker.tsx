@@ -41,6 +41,7 @@ export default function ImagePicker({
   onCropAreaChange,
   library,
   crop = "wide",
+  previewShape = "rect",
   label = "Image",
   emptyText = "No image selected.",
   fallbackUrl,
@@ -54,6 +55,8 @@ export default function ImagePicker({
   onCropAreaChange?: (crop: CropArea | null) => void;
   library: LibraryItem[];
   crop?: CropPreset;
+  /** Cosmetic preview frame — "circle" masks the preview to a circle. */
+  previewShape?: "rect" | "circle";
   label?: string;
   emptyText?: string;
   /** URL to preview when no image has been picked yet — usually the page's
@@ -116,13 +119,22 @@ export default function ImagePicker({
 
       {/* Selected preview */}
       <div className="admin-card overflow-hidden">
-        <div className="relative aspect-[16/9] bg-[repeating-conic-gradient(#0001_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] flex items-center justify-center">
+        <div
+          className={cn(
+            "relative bg-[repeating-conic-gradient(#0001_0%_25%,transparent_0%_50%)] bg-[length:20px_20px] flex items-center justify-center",
+            previewShape === "circle" ? "aspect-square p-6" : "aspect-[16/9]",
+          )}
+        >
           {previewSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={previewSrc}
               alt={selected?.alt ?? ""}
-              className="absolute inset-0 w-full h-full object-cover"
+              className={cn(
+                previewShape === "circle"
+                  ? "relative w-32 h-32 md:w-40 md:h-40 rounded-full object-cover ring-2 ring-white/70 shadow-lg"
+                  : "absolute inset-0 w-full h-full object-cover",
+              )}
             />
           ) : (
             <div className="text-ink/50 text-xs flex flex-col items-center gap-2">

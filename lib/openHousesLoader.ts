@@ -40,13 +40,31 @@ function asCropArea(
   return undefined;
 }
 
+export type OpenHouseDay = {
+  date: string | null;
+  timeLabel: string | null;
+};
+
 export type OpenHouse = {
   id: string;
   slug: string;
   heading: string;
+  /** Legacy single-line address (used as fallback when structured fields blank). */
   address: string;
+  /** Structured address line 2: "Woodbridge, Virginia 22192". */
+  cityLine: string;
+  city: string | null;
+  stateFull: string | null;
+  postalCode: string | null;
+  /** 1 or 2 entries — the flyer renders one date/time pill per entry. */
+  days: OpenHouseDay[];
+  // Legacy single-day accessors kept for any older callers
   date: string | null;
   timeLabel: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  garageSpaces: number;
+  mlsId: string | null;
   features: string[];
   description: string;
   formId: string | null;
@@ -61,8 +79,17 @@ type DbRow = {
   slug: string;
   heading: string;
   address: string;
+  city: string | null;
+  state_full: string | null;
+  postal_code: string | null;
   open_date: string | null;
   open_time_label: string | null;
+  open_date_2: string | null;
+  open_time_label_2: string | null;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  garage_spaces: number | null;
+  mls_id: string | null;
   features: string[] | null;
   description: string | null;
   form_id: string | null;
@@ -92,7 +119,9 @@ function buildUrl(
   return media.url || fallback;
 }
 
-const SELECT = `id, slug, heading, address, open_date, open_time_label,
+const SELECT = `id, slug, heading, address, city, state_full, postal_code,
+  open_date, open_time_label, open_date_2, open_time_label_2,
+  bedrooms, bathrooms, garage_spaces, mls_id,
   features, description, form_id, is_published,
   hero_image_crop, second_image_crop, third_image_crop,
   hero_media:hero_image_id ( cloudinary_public_id, url ),
@@ -100,13 +129,35 @@ const SELECT = `id, slug, heading, address, open_date, open_time_label,
   third_media:third_image_id ( cloudinary_public_id, url )`;
 
 function rowToOpenHouse(row: DbRow): OpenHouse {
+  // Build the structured second-line address ("City, State Full Postal").
+  const cityState = [row.city, row.state_full].filter(Boolean).join(", ");
+  const cityLine = [cityState, row.postal_code].filter(Boolean).join(" ").trim();
+
+  // Compose a 1- or 2-entry days array. Day 2 only counts if a date or time
+  // label is present.
+  const days: OpenHouseDay[] = [
+    { date: row.open_date, timeLabel: row.open_time_label },
+  ];
+  if (row.open_date_2 || row.open_time_label_2) {
+    days.push({ date: row.open_date_2, timeLabel: row.open_time_label_2 });
+  }
+
   return {
     id: row.id,
     slug: row.slug,
     heading: row.heading,
     address: row.address,
+    cityLine,
+    city: row.city,
+    stateFull: row.state_full,
+    postalCode: row.postal_code,
+    days,
     date: row.open_date,
     timeLabel: row.open_time_label,
+    bedrooms: row.bedrooms,
+    bathrooms: row.bathrooms == null ? null : Number(row.bathrooms),
+    garageSpaces: row.garage_spaces ?? 0,
+    mlsId: row.mls_id,
     features: row.features ?? [],
     description: row.description ?? "",
     formId: row.form_id,
@@ -120,16 +171,27 @@ function rowToOpenHouse(row: DbRow): OpenHouse {
 export async function getOpenHouseBySlug(slug: string): Promise<OpenHouse | null> {
   try {
     const supabase = client();
-    if (!supabase) return null;
+    if (!supabase) {
+      console.error("[openHousesLoader] no supabase client");
+      return null;
+    }
     const { data, error } = await supabase
       .from("open_houses")
       .select(SELECT)
       .eq("slug", slug)
       .eq("is_published", true)
       .maybeSingle();
-    if (error || !data) return null;
+    if (error) {
+      console.error("[openHousesLoader] query error:", error);
+      return null;
+    }
+    if (!data) {
+      console.error("[openHousesLoader] no row for slug:", slug);
+      return null;
+    }
     return rowToOpenHouse(data as unknown as DbRow);
-  } catch {
+  } catch (e) {
+    console.error("[openHousesLoader] caught:", e);
     return null;
   }
 }

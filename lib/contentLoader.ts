@@ -22,7 +22,7 @@ let cached: SupabaseClient | null = null;
  * (Equivalent to "everyone can read content" — but cleaner than a public RLS
  * policy that would also need write protection.)
  */
-function getServiceClient(): SupabaseClient | null {
+export function getServiceClient(): SupabaseClient | null {
   if (
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -352,4 +352,163 @@ export async function getPortrait(): Promise<{ full: string; avatar: string }> {
   } catch {
     return fallback;
   }
+}
+
+/**
+ * Generic "look up a single image picked in admin under a given brand
+ * section" helper. Each new brand section (brokerLogo, favicon,
+ * featuredImage) adds one image — this resolves the picked media row to
+ * a Cloudinary URL with the desired delivery options, falling back to
+ * the supplied URL when nothing has been picked yet.
+ */
+async function resolveBrandImage(
+  sectionKey: string,
+  fieldName: string,
+  fallbackUrl: string,
+  delivery: {
+    crop?: "square" | "portrait" | "landscape" | "wide" | "free";
+    width?: number;
+  } = {},
+): Promise<string> {
+  try {
+    const supabase = getServiceClient();
+    if (!supabase) return fallbackUrl;
+    const { data: row } = await supabase
+      .from("content_blocks")
+      .select("value")
+      .eq("page", "brand")
+      .eq("key", sectionKey)
+      .maybeSingle();
+    if (!row?.value) return fallbackUrl;
+
+    let imageId: string | null = null;
+    try {
+      const parsed = JSON.parse(row.value) as Record<
+        string,
+        { image_id?: string }
+      >;
+      imageId = parsed?.[fieldName]?.image_id ?? null;
+    } catch {
+      return fallbackUrl;
+    }
+    if (!imageId) return fallbackUrl;
+
+    const { data: media } = await supabase
+      .from("media")
+      .select("cloudinary_public_id, url")
+      .eq("id", imageId)
+      .maybeSingle();
+    if (!media) return fallbackUrl;
+
+    if (media.cloudinary_public_id) {
+      const { cldUrl } = await import("./cloudinary");
+      return cldUrl(media.cloudinary_public_id, {
+        crop: delivery.crop && delivery.crop !== "free" ? delivery.crop : undefined,
+        width: delivery.width ?? 1200,
+      });
+    }
+    return media.url || fallbackUrl;
+  } catch {
+    return fallbackUrl;
+  }
+}
+
+/** Brokerage logo — used on the open-house flyer header band etc. */
+export async function getBrokerLogo(): Promise<string> {
+  return resolveBrandImage(
+    "brokerLogo",
+    "logo",
+    "/images/Remax%20Galaxy.png",
+    { width: 480 },
+  );
+}
+
+/**
+ * Resolve the Cloudinary public_id of a picked brand image (without building
+ * the URL). Used when callers need to layer custom transforms on top —
+ * e.g. the favicon needs `r_max` (circular mask) which has to be chained
+ * inside cldUrl(), not bolted onto a finished URL.
+ */
+async function resolveBrandImagePublicId(
+  sectionKey: string,
+  fieldName: string,
+): Promise<{ publicId: string; url: string } | null> {
+  try {
+    const supabase = getServiceClient();
+    if (!supabase) return null;
+    const { data: row } = await supabase
+      .from("content_blocks")
+      .select("value")
+      .eq("page", "brand")
+      .eq("key", sectionKey)
+      .maybeSingle();
+    if (!row?.value) return null;
+
+    let imageId: string | null = null;
+    try {
+      const parsed = JSON.parse(row.value) as Record<
+        string,
+        { image_id?: string }
+      >;
+      imageId = parsed?.[fieldName]?.image_id ?? null;
+    } catch {
+      return null;
+    }
+    if (!imageId) return null;
+
+    const { data: media } = await supabase
+      .from("media")
+      .select("cloudinary_public_id, url")
+      .eq("id", imageId)
+      .maybeSingle();
+    if (!media?.cloudinary_public_id) return null;
+    return { publicId: media.cloudinary_public_id, url: media.url ?? "" };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Favicon — delivered as a circular PNG with transparent corners so it
+ * actually renders round on the browser tab (not just inside the admin
+ * picker preview). Falls back to the realtor portrait when no favicon
+ * has been picked, then to the static portrait path as a last resort.
+ */
+export async function getFavicon(): Promise<string> {
+  const { cldUrl } = await import("./cloudinary");
+
+  // 1) Explicit favicon section
+  const favicon = await resolveBrandImagePublicId("favicon", "icon");
+  if (favicon) {
+    return cldUrl(favicon.publicId, {
+      crop: "square",
+      width: 256,
+      circle: true,
+    });
+  }
+
+  // 2) Fall through to the realtor portrait
+  const portrait = await resolveBrandImagePublicId("portrait", "portrait");
+  if (portrait) {
+    return cldUrl(portrait.publicId, {
+      crop: "square",
+      width: 256,
+      circle: true,
+    });
+  }
+
+  // 3) No Cloudinary asset → fall back to the static path. Will render
+  // square in the tab until the admin uploads a real favicon.
+  const staticPortrait = await getPortrait();
+  return staticPortrait.avatar;
+}
+
+/** Site-wide social-share image (default OG image). */
+export async function getFeaturedImage(): Promise<string> {
+  return resolveBrandImage(
+    "featuredImage",
+    "image",
+    "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1200&auto=format&fit=crop&q=85",
+    { crop: "wide", width: 1200 },
+  );
 }

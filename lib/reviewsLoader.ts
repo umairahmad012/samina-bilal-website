@@ -59,6 +59,12 @@ export async function getReviews(opts: { onlyHomepage?: boolean } = {}): Promise
         "id, source, author_name, author_short_label, rating, quote, is_featured_homepage, display_order",
       )
       .eq("is_visible", true)
+      // Only approved rows ever go public — pending Google reviews stay
+      // private until the admin approves; rejected ones never leak.
+      .eq("status", "approved")
+      // Internal feedback is private by design — never surface even if a
+      // row was accidentally promoted to source='internal'.
+      .neq("source", "internal")
       .order("display_order", { ascending: true });
 
     if (opts.onlyHomepage) {

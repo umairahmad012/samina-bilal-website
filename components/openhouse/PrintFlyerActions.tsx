@@ -2,30 +2,42 @@
 
 import { useEffect, useState } from "react";
 import { Printer, UserPlus } from "lucide-react";
-import SignupModal from "./SignupModal";
+import SignupModal, { type SignupPill } from "./SignupModal";
 
 /**
  * The hovering action bar at center-bottom of the open-house landing page.
- * - Print button → triggers window.print() (CSS @media print scopes the
- *   page down to the A4 flyer layout).
- * - RSVP button → opens the auto-generated sign-up form in a modal.
+ * - Print Flyer button → triggers window.print() (CSS @media print scopes
+ *   the page down to the A4 flyer layout).
+ * - RSVP button → opens the auto-generated sign-up form in a modal with
+ *   hero photo + features bracketing the form.
  *
  * Hidden during print via the `.no-print` class.
  *
  * Auto-fires print() on mount when the URL contains `?print=1` so the
- * admin's "Print flyer" link goes straight to the OS print dialog.
+ * admin's "Print flyer" link and the in-app "Download Flyer" button go
+ * straight to the OS print dialog.
  */
 export default function PrintFlyerActions({
   formId,
   formSlug,
+  slug,
   heading,
   address,
+  heroImage,
+  dateLabel,
+  timeLabel,
+  pills,
   hasForm,
 }: {
   formId: string;
   formSlug: string;
+  slug: string;
   heading: string;
   address: string;
+  heroImage: string;
+  dateLabel?: string;
+  timeLabel?: string | null;
+  pills: SignupPill[];
   hasForm: boolean;
 }) {
   const [signupOpen, setSignupOpen] = useState(false);
@@ -41,9 +53,7 @@ export default function PrintFlyerActions({
 
   return (
     <>
-      <div
-        className="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-navy text-white rounded-full shadow-2xl border border-white/10 flex items-center overflow-hidden"
-      >
+      <div className="no-print fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-navy text-white rounded-full shadow-2xl border border-white/10 flex items-center overflow-hidden">
         {hasForm && (
           <button
             type="button"
@@ -72,8 +82,13 @@ export default function PrintFlyerActions({
         <SignupModal
           formId={formId}
           formSlug={formSlug}
+          slug={slug}
           heading={heading}
           address={address}
+          heroImage={heroImage}
+          dateLabel={dateLabel}
+          timeLabel={timeLabel}
+          pills={pills}
           onClose={() => setSignupOpen(false)}
         />
       )}

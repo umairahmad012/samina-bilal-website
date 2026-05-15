@@ -7,15 +7,18 @@
  *                                the row in `public.media`.
  *   saveYouTubeRecord(url)     — parse + store a YouTube background.
  *   updateMediaAlt(id, alt)    — edit alt text inline.
- *   updateMediaCrop(id, crop)  — store a default crop variant for an image.
- *   deleteMedia(id)            — remove from `public.media`. (Cloudinary
- *                                files are kept — admin can purge from there
- *                                if storage costs become an issue.)
+ *   deleteMedia(id)            — remove from `public.media` AND destroy the
+ *                                underlying Cloudinary asset (frees storage).
+ *   deleteMediaMany(ids[])     — bulk version, used by the library checkbox UI.
  */
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { parseYouTubeId, youTubeWatchUrl } from "@/lib/cloudinary";
+import {
+  destroyCloudinaryAsset,
+  destroyCloudinaryAssets,
+} from "@/lib/cloudinaryAdmin";
 
 type Result = { ok: true; id: string } | { ok: false; error: string };
 type SimpleResult = { ok: true } | { ok: false; error: string };
@@ -105,16 +108,6 @@ export async function updateMediaAlt(
   return { ok: true };
 }
 
-/**
- * Persist a default crop preset on an image so consumers can always render
- * the same framing. Stored in a small JSON metadata blob next to the row;
- * the schema doesn't have a dedicated column, so we store under `alt` if
- * needed — but cleaner: re-use cloudinary_public_id with a transformation
- * suffix? No, let's add a `defaultCrop` we read at render time. For now
- * we'll persist nothing — crops are applied via cldUrl() at consume-time
- * by the picker. Hook reserved for future expansion.
- */
-
 export async function deleteMedia(id: string): Promise<SimpleResult> {
   const supabase = await createClient();
   const {
@@ -122,10 +115,65 @@ export async function deleteMedia(id: string): Promise<SimpleResult> {
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
+  // Look up the public_id + kind so we can free the actual Cloudinary asset.
+  const { data: row } = await supabase
+    .from("media")
+    .select("cloudinary_public_id, kind")
+    .eq("id", id)
+    .maybeSingle();
+
   const { error } = await supabase.from("media").delete().eq("id", id);
   if (error) return { ok: false, error: error.message };
+
+  // YouTube rows have no Cloudinary asset to clean up.
+  if (row?.cloudinary_public_id && row.kind === "image") {
+    await destroyCloudinaryAsset(row.cloudinary_public_id, "image");
+  }
 
   revalidatePath("/admin/media");
   revalidatePath("/", "layout");
   return { ok: true };
+}
+
+export async function deleteMediaMany(
+  ids: string[],
+): Promise<{ ok: boolean; deleted: number; failed: number; error?: string }> {
+  if (!ids || ids.length === 0) {
+    return { ok: false, deleted: 0, failed: 0, error: "Nothing selected." };
+  }
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, deleted: 0, failed: ids.length, error: "Not signed in." };
+
+  // Fetch public_ids before delete so we can free Cloudinary storage after.
+  const { data: rows } = await supabase
+    .from("media")
+    .select("id, cloudinary_public_id, kind")
+    .in("id", ids);
+
+  const { error } = await supabase.from("media").delete().in("id", ids);
+  if (error) {
+    return { ok: false, deleted: 0, failed: ids.length, error: error.message };
+  }
+
+  const cloudinaryIds = (rows ?? [])
+    .filter((r) => r.kind === "image" && r.cloudinary_public_id)
+    .map((r) => r.cloudinary_public_id as string);
+
+  let cloudinaryFailed = 0;
+  if (cloudinaryIds.length > 0) {
+    const result = await destroyCloudinaryAssets(cloudinaryIds, "image");
+    cloudinaryFailed = result.failed;
+  }
+
+  revalidatePath("/admin/media");
+  revalidatePath("/", "layout");
+
+  return {
+    ok: true,
+    deleted: ids.length,
+    failed: cloudinaryFailed, // DB rows always succeeded; this counts orphaned Cloudinary files
+  };
 }

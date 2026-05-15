@@ -1,21 +1,18 @@
 /**
- * The 10 feature options realtors can pick for an Open House landing page.
- * Realtors choose 4. Stored on the row as a string[] of `key` values; UI
- * renders the matching `label`.
- *
- * Add/remove/reword as needed — the DB stores keys, so changing labels here
- * is purely cosmetic. Removing a key just hides it from the picker; existing
- * open houses still render the historical label if you keep an entry.
+ * Optional "extra" features for an open house. Bedrooms, bathrooms, and
+ * garage spaces live in their own structured columns on `open_houses` —
+ * the flyer always shows those first, then fills the remaining feature
+ * pills from this list (limit 4 pills total per flyer).
  */
 
 export type OpenHouseFeatureKey =
+  | "floor_plans_available"
   | "open_floor_plan"
   | "hardwood_floors"
   | "gourmet_kitchen"
   | "updated_bathrooms"
   | "primary_suite"
   | "finished_basement"
-  | "two_car_garage"
   | "large_backyard"
   | "smart_home_tech"
   | "outdoor_living";
@@ -28,19 +25,46 @@ export type OpenHouseFeature = {
 };
 
 export const OPEN_HOUSE_FEATURES: OpenHouseFeature[] = [
-  { key: "open_floor_plan",   label: "Open Floor Plan",   icon: "LayoutDashboard" },
-  { key: "hardwood_floors",   label: "Hardwood Floors",   icon: "TreePine" },
-  { key: "gourmet_kitchen",   label: "Gourmet Kitchen",   icon: "ChefHat" },
-  { key: "updated_bathrooms", label: "Updated Bathrooms", icon: "Bath" },
-  { key: "primary_suite",     label: "Primary Suite",     icon: "BedDouble" },
-  { key: "finished_basement", label: "Finished Basement", icon: "Layers" },
-  { key: "two_car_garage",    label: "Two-Car Garage",    icon: "Car" },
-  { key: "large_backyard",    label: "Large Backyard",    icon: "Trees" },
-  { key: "smart_home_tech",   label: "Smart-Home Tech",   icon: "Smartphone" },
-  { key: "outdoor_living",    label: "Outdoor Living",    icon: "Tent" },
+  { key: "floor_plans_available", label: "Floor Plans Available", icon: "FileSpreadsheet" },
+  { key: "open_floor_plan",       label: "Open Floor Plan",       icon: "LayoutDashboard" },
+  { key: "hardwood_floors",       label: "Hardwood Floors",       icon: "TreePine" },
+  { key: "gourmet_kitchen",       label: "Gourmet Kitchen",       icon: "ChefHat" },
+  { key: "updated_bathrooms",     label: "Updated Bathrooms",     icon: "Bath" },
+  { key: "primary_suite",         label: "Primary Suite",         icon: "BedDouble" },
+  { key: "finished_basement",     label: "Finished Basement",     icon: "Layers" },
+  { key: "large_backyard",        label: "Large Backyard",        icon: "Trees" },
+  { key: "smart_home_tech",       label: "Smart-Home Tech",       icon: "Smartphone" },
+  { key: "outdoor_living",        label: "Outdoor Living",        icon: "Tent" },
 ];
 
 export const OPEN_HOUSE_FEATURE_BY_KEY: Record<string, OpenHouseFeature> =
   Object.fromEntries(OPEN_HOUSE_FEATURES.map((f) => [f.key, f]));
 
-export const MAX_FEATURES = 4;
+/** Total feature pills on the flyer (bed + bath + garage when > 0 + extras). */
+export const TOTAL_FLYER_PILLS = 4;
+
+/** Word limit for the open-house tagline / description. */
+export const DESCRIPTION_WORD_LIMIT = 100;
+
+/** Count whitespace-separated words. */
+export function countWords(s: string): number {
+  return s.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/** Trim a string to at most `limit` words, preserving original spacing. */
+export function clampToWords(s: string, limit: number): string {
+  const parts = s.split(/(\s+)/); // keep separators
+  let count = 0;
+  let out = "";
+  for (const p of parts) {
+    if (/^\s+$/.test(p)) {
+      out += p;
+      continue;
+    }
+    if (p === "") continue;
+    if (count >= limit) break;
+    out += p;
+    count++;
+  }
+  return out.trimEnd();
+}

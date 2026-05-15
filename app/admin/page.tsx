@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import AdminShell from "@/components/admin/AdminShell";
 import AdminLoginForm from "@/components/admin/AdminLoginForm";
+import AdminCard from "@/components/admin/AdminCard";
 import {
   FileText,
   Image as ImageIcon,
@@ -10,33 +11,71 @@ import {
   Briefcase,
   UsersRound,
   DoorOpen,
+  Palette,
+  Plug,
+  BarChart3,
+  Search,
 } from "lucide-react";
-import Link from "next/link";
 
-const editorSections = [
+// Each card has its own accent + a domain-specific animated visual.
+// Variants are content-aware: palette swatches for brand, growing houses
+// for communities, ticking checkmarks for closings, etc.
+import type { AdminCardVariant } from "@/components/admin/AdminCardVisuals";
+
+const editorSections: Array<{
+  href: string;
+  icon: typeof Palette;
+  title: string;
+  description: string;
+  accent: string;
+  badge: string;
+  variant: AdminCardVariant;
+}> = [
+  {
+    href: "/admin/brand",
+    icon: Palette,
+    title: "Brand Identity",
+    description:
+      "Site colors, name, photos, broker logo, favicon, and share image — everything that defines the look and feel.",
+    accent: "#2e7d32",
+    badge: "Look & feel",
+    variant: "palette",
+  },
   {
     href: "/admin/content",
     icon: FileText,
     title: "Content",
     description: "Headings, paragraphs, CTAs across every page.",
+    accent: "#5b7c4a",
+    badge: "Copy",
+    variant: "lines",
   },
   {
     href: "/admin/media",
     icon: ImageIcon,
     title: "Media Library",
     description: "Upload, crop, remove backgrounds. Swap images and videos.",
+    accent: "#8d6e63",
+    badge: "Assets",
+    variant: "stack",
   },
   {
     href: "/admin/communities",
     icon: HomeIcon,
     title: "Communities",
     description: "Edit the 6 neighborhoods and their yearly market data.",
+    accent: "#1b5e20",
+    badge: "Neighborhoods",
+    variant: "houses",
   },
   {
     href: "/admin/closings",
     icon: Briefcase,
     title: "Recent Closings",
     description: "Add and manage closed-sale entries.",
+    accent: "#6d4c41",
+    badge: "Sales",
+    variant: "checks",
   },
   {
     href: "/admin/open-houses",
@@ -44,24 +83,66 @@ const editorSections = [
     title: "Open Houses",
     description:
       "Build a landing page + printable A4 flyer for each open house. Auto-generates an RSVP form.",
+    accent: "#388e3c",
+    badge: "Listings",
+    variant: "door",
   },
   {
     href: "/admin/reviews",
     icon: Star,
     title: "Reviews",
     description: "Manage testimonials. Pull from Google. Share review link.",
+    accent: "#a47148",
+    badge: "Social proof",
+    variant: "stars",
   },
   {
     href: "/admin/partners",
     icon: Users,
     title: "Trusted Partners",
     description: "Lenders, inspectors, insurance, and trades.",
+    accent: "#4caf50",
+    badge: "Network",
+    variant: "nodes",
   },
   {
     href: "/admin/team",
     icon: UsersRound,
     title: "Team",
     description: "Invite teammates and manage owner / editor roles.",
+    accent: "#3e2723",
+    badge: "Access",
+    variant: "team",
+  },
+  {
+    href: "/admin/integrations/google",
+    icon: Plug,
+    title: "Integrations",
+    description:
+      "Connect Google Reviews, Mailchimp, and more. Pull reviews from Google directly into your admin queue for approval.",
+    accent: "#2e7d32",
+    badge: "Connect",
+    variant: "plug",
+  },
+  {
+    href: "/admin/analytics",
+    icon: BarChart3,
+    title: "Website Analytics",
+    description:
+      "See traffic, page views, and where visitors come from. Powered by Google Analytics 4 — paste your Measurement ID once and we install the tag everywhere.",
+    accent: "#388e3c",
+    badge: "Insights",
+    variant: "chart",
+  },
+  {
+    href: "/admin/seo",
+    icon: Search,
+    title: "SEO",
+    description:
+      "Search visibility tools — auto-deploy county landing pages targeting 'realtor in [county]' searches, sitemap, image alt-text audit, and Search Console hookup.",
+    accent: "#1b5e20",
+    badge: "Visibility",
+    variant: "search",
   },
 ];
 
@@ -96,7 +177,7 @@ export default async function AdminDashboard({
           </p>
           <h1
             className="text-2xl md:text-3xl text-ink mb-2"
-            style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+            style={{ fontWeight: 600, letterSpacing: "0.01em" }}
           >
             What would you like to update?
           </h1>
@@ -107,32 +188,18 @@ export default async function AdminDashboard({
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {editorSections.map((s) => {
-            const Icon = s.icon;
-            return (
-              <Link
-                key={s.href}
-                href={s.href}
-                className="admin-card group p-6 hover:border-navy/30 transition-colors flex flex-col"
-              >
-                <div className="text-navy mb-5">
-                  <Icon size={22} strokeWidth={1.5} />
-                </div>
-                <h3
-                  className="text-base text-ink mb-1.5"
-                  style={{ fontWeight: 500 }}
-                >
-                  {s.title}
-                </h3>
-                <p className="text-xs text-ink/65 leading-relaxed flex-1">
-                  {s.description}
-                </p>
-                <span className="text-[0.65rem] tracking-[0.28em] uppercase text-navy mt-5 group-hover:underline underline-offset-4">
-                  Open →
-                </span>
-              </Link>
-            );
-          })}
+          {editorSections.map((s) => (
+            <AdminCard
+              key={s.href}
+              href={s.href}
+              icon={s.icon}
+              title={s.title}
+              description={s.description}
+              badge={s.badge}
+              accent={s.accent}
+              variant={s.variant}
+            />
+          ))}
         </div>
 
         {/* Status — what's live and what's next */}

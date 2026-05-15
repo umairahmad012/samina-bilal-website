@@ -63,7 +63,7 @@ export default function AdminSignupForm() {
     return (
       <div className="min-h-screen flex items-center justify-center px-6 py-12">
         <div className="admin-card w-full max-w-md p-10 text-center">
-          <h1 className="text-xl mb-3" style={{ fontWeight: 300 }}>
+          <h1 className="text-xl mb-3" style={{ fontWeight: 600 }}>
             Account created.
           </h1>
           <p className="text-sm text-ink/70 mb-6">
@@ -83,7 +83,7 @@ export default function AdminSignupForm() {
       <div className="admin-card w-full max-w-md p-10">
         <h1
           className="text-2xl mb-2 text-ink"
-          style={{ fontWeight: 300, letterSpacing: "0.06em" }}
+          style={{ fontWeight: 600, letterSpacing: "0.01em" }}
         >
           First-Time Setup
         </h1>

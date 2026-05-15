@@ -43,7 +43,7 @@ export default function AdminLoginForm({ from }: { from?: string }) {
       <div className="admin-card w-full max-w-md p-10">
         <h1
           className="text-2xl mb-2 text-ink"
-          style={{ fontWeight: 300, letterSpacing: "0.06em" }}
+          style={{ fontWeight: 600, letterSpacing: "0.01em" }}
         >
           Samina&nbsp;Bilal · Admin
         </h1>

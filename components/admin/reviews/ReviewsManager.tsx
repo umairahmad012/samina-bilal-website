@@ -22,6 +22,8 @@ import {
   reorderReviews,
   approveSubmission,
   rejectSubmission,
+  approvePendingReview,
+  hidePendingReview,
   type ReviewInput,
   type ReviewSource,
 } from "@/app/admin/reviews/actions";
@@ -37,16 +39,21 @@ export type ReviewRow = {
   quote: string;
   is_featured_homepage: boolean;
   is_visible: boolean;
+  /** 'pending' | 'approved' | 'rejected' — pending = awaiting admin decision */
+  status?: "pending" | "approved" | "rejected";
   display_order: number;
+  written_at?: string | null;
 };
 
 export type SubmissionRow = {
   id: string;
   author_name: string | null;
   author_email: string | null;
+  author_phone?: string | null;
   rating: number | null;
   quote: string;
   status: "pending" | "approved" | "rejected";
+  kind?: "public" | "internal";
   submitted_at: string;
 };
 
@@ -59,10 +66,17 @@ const SOURCES: { key: ReviewSource; label: string }[] = [
 
 export default function ReviewsManager({
   initial,
+  pendingGoogle = [],
   submissions,
+  internalFeedback = [],
 }: {
   initial: ReviewRow[];
+  /** Reviews pulled from Google awaiting admin approval. */
+  pendingGoogle?: ReviewRow[];
+  /** Public-form submissions from /leave-review (kind='public'). */
   submissions: SubmissionRow[];
+  /** Private-form submissions from /leave-review-internal (kind='internal'). */
+  internalFeedback?: SubmissionRow[];
 }) {
   const router = useRouter();
   const [items, setItems] = useState<ReviewRow[]>(initial);
@@ -93,6 +107,188 @@ export default function ReviewsManager({
 
   return (
     <div className="space-y-10">
+      {/* Pending Google reviews — awaiting admin approval before public display */}
+      {pendingGoogle.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2
+              className="text-xs tracking-[0.18em] uppercase"
+              style={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+            >
+              Pending Google reviews ({pendingGoogle.length})
+            </h2>
+            <span
+              className="text-[10px] uppercase tracking-[0.18em] px-2 py-1 rounded-full"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 14%, transparent)",
+                color: "var(--primary)",
+                fontWeight: 700,
+              }}
+            >
+              From Google · auto-pulled
+            </span>
+          </div>
+          <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
+            These are live on Google already. Approve to also show on the website,
+            or hide to keep them off the website (they stay on Google either way).
+          </p>
+          <div className="space-y-2">
+            {pendingGoogle.map((r) => (
+              <div key={r.id} className="admin-card p-4">
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <p className="text-sm" style={{ fontWeight: 500, color: "var(--card-foreground)" }}>
+                      {r.author_name || "Anonymous"}
+                      <span
+                        className="ml-2 font-normal"
+                        style={{ color: "var(--muted-foreground)" }}
+                      >
+                        · {r.author_short_label || (r.written_at ? new Date(r.written_at).toLocaleDateString() : "")}
+                      </span>
+                    </p>
+                    <Stars value={r.rating ?? 5} />
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startTransition(async () => {
+                          await approvePendingReview(r.id);
+                          router.refresh();
+                        })
+                      }
+                      className="text-xs inline-flex items-center gap-1"
+                      style={{ color: "var(--primary)", fontWeight: 600 }}
+                    >
+                      <Check size={13} /> Approve
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startTransition(async () => {
+                          await hidePendingReview(r.id);
+                          router.refresh();
+                        })
+                      }
+                      className="text-xs inline-flex items-center gap-1"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      <EyeOff size={13} /> Hide
+                    </button>
+                  </div>
+                </div>
+                <p
+                  className="text-sm leading-relaxed italic"
+                  style={{ color: "var(--card-foreground)" }}
+                >
+                  &ldquo;{r.quote}&rdquo;
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Private internal feedback — never auto-publishes anywhere */}
+      {internalFeedback.length > 0 && (
+        <section>
+          <div className="flex items-center justify-between mb-3">
+            <h2
+              className="text-xs tracking-[0.18em] uppercase"
+              style={{ color: "var(--muted-foreground)", fontWeight: 600 }}
+            >
+              Internal feedback ({internalFeedback.length})
+            </h2>
+            <span
+              className="text-[10px] uppercase tracking-[0.18em] px-2 py-1 rounded-full"
+              style={{
+                background: "color-mix(in srgb, var(--destructive) 12%, transparent)",
+                color: "var(--destructive)",
+                fontWeight: 700,
+              }}
+            >
+              Private · not on Google or website
+            </span>
+          </div>
+          <p className="text-xs mb-4" style={{ color: "var(--muted-foreground)" }}>
+            Private client feedback from your /leave-review-internal link. Only
+            you see this. If a piece of feedback is great, click <em>Approve to
+            website</em> to publish it (it still won&apos;t go to Google). Otherwise
+            click <em>Mark resolved</em> to clear from this list.
+          </p>
+          <div className="space-y-2">
+            {internalFeedback.map((s) => (
+              <div
+                key={s.id}
+                className="admin-card p-4"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--destructive) 20%, var(--border))",
+                }}
+              >
+                <div className="flex items-start justify-between gap-3 mb-2">
+                  <div>
+                    <p className="text-sm" style={{ fontWeight: 500, color: "var(--card-foreground)" }}>
+                      {s.author_name || "Anonymous"}
+                      {s.author_email && (
+                        <span
+                          className="ml-2 font-normal"
+                          style={{ color: "var(--muted-foreground)" }}
+                        >
+                          · {s.author_email}
+                        </span>
+                      )}
+                    </p>
+                    <Stars value={s.rating ?? 5} />
+                    <p
+                      className="text-[11px] mt-0.5"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      {new Date(s.submitted_at).toLocaleDateString()}
+                      {s.author_phone && ` · ${s.author_phone}`}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startTransition(async () => {
+                          await approveSubmission(s.id);
+                          router.refresh();
+                        })
+                      }
+                      className="text-xs inline-flex items-center gap-1"
+                      style={{ color: "var(--primary)", fontWeight: 600 }}
+                      title="Promote to public website (still won't post to Google)"
+                    >
+                      <Check size={13} /> Approve to website
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        startTransition(async () => {
+                          await rejectSubmission(s.id);
+                          router.refresh();
+                        })
+                      }
+                      className="text-xs inline-flex items-center gap-1"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      <X size={13} /> Mark resolved
+                    </button>
+                  </div>
+                </div>
+                <p
+                  className="text-sm leading-relaxed italic"
+                  style={{ color: "var(--card-foreground)" }}
+                >
+                  &ldquo;{s.quote}&rdquo;
+                </p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Pending submissions */}
       {submissions.length > 0 && (
         <section>

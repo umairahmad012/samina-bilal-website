@@ -150,6 +150,7 @@ function ImageField({
     <ImagePicker
       label={field.label}
       crop={field.crop ?? "free"}
+      previewShape={field.previewShape}
       value={imageId}
       onChange={(id) =>
         onChange({ image_id: id, cropArea: cropArea ?? undefined })

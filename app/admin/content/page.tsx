@@ -23,7 +23,7 @@ export default async function ContentIndexPage() {
         </p>
         <h1
           className="text-2xl md:text-3xl text-ink mb-2"
-          style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+          style={{ fontWeight: 600, letterSpacing: "0.01em" }}
         >
           Edit a page.
         </h1>
@@ -34,7 +34,7 @@ export default async function ContentIndexPage() {
         </p>
 
         <div className="space-y-2">
-          {PAGE_ORDER.map((p) => {
+          {PAGE_ORDER.filter((p) => p !== "brand").map((p) => {
             const sections = sectionsForPage(p);
             return (
               <Link

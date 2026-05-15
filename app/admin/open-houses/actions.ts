@@ -10,10 +10,25 @@ type Result = { ok: true; slug?: string } | { ok: false; error: string };
 
 export type OpenHouseInput = {
   slug: string;
+
+  // Address — line 1 = street + #, line 2 = city / state (full) / postal
   heading: string;
-  address: string;
+  address: string; // legacy single-line, auto-assembled on save for compat
+  city: string | null;
+  state_full: string | null;
+  postal_code: string | null;
+
+  // Up to two days. Day 2 is optional.
   open_date: string | null; // YYYY-MM-DD
   open_time_label: string | null;
+  open_date_2: string | null;
+  open_time_label_2: string | null;
+
+  // Structured listing fields — always shown on the flyer
+  bedrooms: number | null;
+  bathrooms: number | null;
+  garage_spaces: number;
+  mls_id: string | null;
 
   hero_image_id: string | null;
   hero_image_crop: CropArea | null;
@@ -22,11 +37,21 @@ export type OpenHouseInput = {
   third_image_id: string | null;
   third_image_crop: CropArea | null;
 
+  /** Optional extras — fill remaining feature pills after bed/bath/garage. */
   features: string[];
   description: string;
 
   is_published: boolean;
 };
+
+/** Derive a URL-safe slug from a street address heading. */
+export async function slugifyAddress(addr: string): Promise<string> {
+  return addr
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 async function requireUser() {
   const supabase = await createClient();
@@ -34,6 +59,40 @@ async function requireUser() {
     data: { user },
   } = await supabase.auth.getUser();
   return { supabase, user };
+}
+
+/** Pick a slug derived from the street address that doesn't collide. */
+async function uniqueSlugForAddress(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  heading: string,
+  excludeId?: string,
+): Promise<string> {
+  const base =
+    heading
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "") || "open-house";
+  let candidate = base;
+  for (let n = 2; n < 50; n++) {
+    const { data } = await supabase
+      .from("open_houses")
+      .select("id")
+      .eq("slug", candidate)
+      .maybeSingle();
+    if (!data || (excludeId && data.id === excludeId)) return candidate;
+    candidate = `${base}-${n}`;
+  }
+  return `${base}-${Date.now()}`;
+}
+
+/** Compose a single-line address from the structured pieces. */
+function composeAddress(input: OpenHouseInput): string {
+  const cityState = [input.city, input.state_full]
+    .filter(Boolean)
+    .join(", ");
+  const tail = [cityState, input.postal_code].filter(Boolean).join(" ");
+  return [input.heading, tail].filter(Boolean).join(", ");
 }
 
 /** Fields that ship with every auto-generated open-house RSVP form. */
@@ -53,15 +112,19 @@ export async function createOpenHouse(input: OpenHouseInput): Promise<Result> {
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
+  // Auto-derive the slug from the street-address heading.
+  const slug = await uniqueSlugForAddress(supabase, input.heading);
+  const composedAddress = composeAddress(input);
+
   // Auto-create the matching RSVP form so the landing page has somewhere
   // to send sign-ups. Slug is `open-house-<slug>` to keep namespaces clean.
-  const formSlug = `open-house-${input.slug}`;
+  const formSlug = `open-house-${slug}`;
   const { data: formRow, error: formErr } = await supabase
     .from("forms")
     .insert({
       slug: formSlug,
       title: `RSVP — ${input.heading}`,
-      description: `Sign up to attend the open house at ${input.address}.`,
+      description: `Sign up to attend the open house at ${composedAddress}.`,
       fields: RSVP_FIELDS,
       submit_label: "Save my spot",
       success_message:
@@ -71,11 +134,16 @@ export async function createOpenHouse(input: OpenHouseInput): Promise<Result> {
     .select("id")
     .single();
   if (formErr || !formRow) {
-    return { ok: false, error: formErr?.message ?? "Could not create RSVP form." };
+    return {
+      ok: false,
+      error: formErr?.message ?? "Could not create RSVP form.",
+    };
   }
 
   const { error } = await supabase.from("open_houses").insert({
     ...input,
+    slug,
+    address: composedAddress,
     form_id: formRow.id,
   });
   if (error) {
@@ -85,8 +153,8 @@ export async function createOpenHouse(input: OpenHouseInput): Promise<Result> {
   }
 
   revalidatePath("/admin/open-houses");
-  revalidatePath(`/open-house/${input.slug}`);
-  return { ok: true, slug: input.slug };
+  revalidatePath(`/open-house/${slug}`);
+  return { ok: true, slug };
 }
 
 export async function updateOpenHouse(
@@ -96,8 +164,12 @@ export async function updateOpenHouse(
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
-  // Keep the linked RSVP form's title + slug in sync if the open house
-  // heading or slug changed.
+  // Re-derive slug from the (possibly edited) heading. Keeps slug in sync
+  // with the address — no manual slug input.
+  const slug = await uniqueSlugForAddress(supabase, input.heading, id);
+  const composedAddress = composeAddress(input);
+
+  // Keep the linked RSVP form in sync.
   const { data: existing } = await supabase
     .from("open_houses")
     .select("form_id, slug")
@@ -107,23 +179,29 @@ export async function updateOpenHouse(
     await supabase
       .from("forms")
       .update({
-        slug: `open-house-${input.slug}`,
+        slug: `open-house-${slug}`,
         title: `RSVP — ${input.heading}`,
-        description: `Sign up to attend the open house at ${input.address}.`,
+        description: `Sign up to attend the open house at ${composedAddress}.`,
       })
       .eq("id", existing.form_id);
   }
 
   const { error } = await supabase
     .from("open_houses")
-    .update({ ...input, updated_at: new Date().toISOString() })
+    .update({
+      ...input,
+      slug,
+      address: composedAddress,
+      updated_at: new Date().toISOString(),
+    })
     .eq("id", id);
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/open-houses");
-  if (existing?.slug) revalidatePath(`/open-house/${existing.slug}`);
-  revalidatePath(`/open-house/${input.slug}`);
-  return { ok: true, slug: input.slug };
+  if (existing?.slug && existing.slug !== slug)
+    revalidatePath(`/open-house/${existing.slug}`);
+  revalidatePath(`/open-house/${slug}`);
+  return { ok: true, slug };
 }
 
 export async function deleteOpenHouse(id: string): Promise<Result> {

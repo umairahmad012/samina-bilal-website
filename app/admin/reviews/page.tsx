@@ -16,19 +16,28 @@ export default async function ReviewsAdminPage() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/admin/login");
 
-  const [{ data: reviews }, { data: subs }] = await Promise.all([
+  const [{ data: allReviews }, { data: subs }] = await Promise.all([
     supabase
       .from("reviews")
       .select(
-        "id, source, external_id, author_name, author_short_label, rating, quote, is_featured_homepage, is_visible, display_order",
+        "id, source, external_id, author_name, author_short_label, rating, quote, is_featured_homepage, is_visible, status, display_order, written_at",
       )
       .order("display_order", { ascending: true }),
     supabase
       .from("review_submissions")
-      .select("id, author_name, author_email, rating, quote, status, submitted_at")
+      .select(
+        "id, author_name, author_email, author_phone, rating, quote, status, kind, submitted_at",
+      )
       .eq("status", "pending")
       .order("submitted_at", { ascending: false }),
   ]);
+
+  // Split into "pending Google" (sourced from Google API, awaiting approval)
+  // vs "live" reviews. Public subs and internal subs are split by `kind`.
+  const reviews = (allReviews ?? []).filter((r) => r.status !== "pending");
+  const pendingGoogle = (allReviews ?? []).filter((r) => r.status === "pending");
+  const pendingPublic = (subs ?? []).filter((s) => s.kind !== "internal");
+  const pendingInternal = (subs ?? []).filter((s) => s.kind === "internal");
 
   return (
     <AdminShell user={{ email: user.email ?? "" }}>
@@ -50,7 +59,7 @@ export default async function ReviewsAdminPage() {
             </p>
             <h1
               className="text-2xl md:text-3xl text-ink mb-2"
-              style={{ fontWeight: 300, letterSpacing: "0.04em" }}
+              style={{ fontWeight: 600, letterSpacing: "0.01em" }}
             >
               Testimonials.
             </h1>
@@ -63,8 +72,10 @@ export default async function ReviewsAdminPage() {
         </div>
 
         <ReviewsManager
-          initial={(reviews ?? []) as ReviewRow[]}
-          submissions={(subs ?? []) as SubmissionRow[]}
+          initial={reviews as ReviewRow[]}
+          pendingGoogle={pendingGoogle as ReviewRow[]}
+          submissions={pendingPublic as SubmissionRow[]}
+          internalFeedback={pendingInternal as SubmissionRow[]}
         />
       </div>
     </AdminShell>

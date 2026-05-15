@@ -8,14 +8,17 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Editorial cream/linen background — warmer than white
-        cream: "#F2EFEA",
-        "cream-soft": "#EDE9E2",
-        // Deep navy editorial accent
+        // Editorial cream/linen background — warmer than white.
+        // Driven by CSS variables so the admin Brand Identity editor can
+        // re-skin the site at runtime. Values default to the originals
+        // (#F2EFEA / #EDE9E2) — see globals.css :root and BrandThemeStyle.
+        cream: "rgb(var(--brand-surface-rgb) / <alpha-value>)",
+        "cream-soft": "rgb(var(--brand-surface-soft-rgb) / <alpha-value>)",
+        // Deep navy editorial accent — same variable-driven pattern.
         navy: {
-          DEFAULT: "#142840",
-          dark: "#0E1C30",
-          light: "#25406A",
+          DEFAULT: "rgb(var(--brand-primary-rgb) / <alpha-value>)",
+          dark: "rgb(var(--brand-primary-dark-rgb) / <alpha-value>)",
+          light: "rgb(var(--brand-primary-light-rgb) / <alpha-value>)",
         },
         // Body type
         ink: "rgba(0, 0, 0, 0.82)",

@@ -37,7 +37,9 @@ export default async function EditOpenHousePage({
   const { data: row } = await supabase
     .from("open_houses")
     .select(
-      `id, slug, heading, address, open_date, open_time_label,
+      `id, slug, heading, address, city, state_full, postal_code,
+       open_date, open_time_label, open_date_2, open_time_label_2,
+       bedrooms, bathrooms, garage_spaces, mls_id,
        hero_image_id, hero_image_crop, second_image_id, second_image_crop,
        third_image_id, third_image_crop, features, description, is_published`,
     )
@@ -55,8 +57,17 @@ export default async function EditOpenHousePage({
     slug: row.slug,
     heading: row.heading,
     address: row.address,
+    city: row.city ?? null,
+    state_full: row.state_full ?? null,
+    postal_code: row.postal_code ?? null,
     open_date: row.open_date ?? null,
     open_time_label: row.open_time_label ?? "",
+    open_date_2: row.open_date_2 ?? null,
+    open_time_label_2: row.open_time_label_2 ?? null,
+    bedrooms: row.bedrooms ?? null,
+    bathrooms: row.bathrooms == null ? null : Number(row.bathrooms),
+    garage_spaces: row.garage_spaces ?? 0,
+    mls_id: row.mls_id ?? null,
     hero_image_id: row.hero_image_id ?? null,
     hero_image_crop: asCropArea(row.hero_image_crop),
     second_image_id: row.second_image_id ?? null,

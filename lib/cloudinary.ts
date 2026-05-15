@@ -47,6 +47,13 @@ export type CldOptions = {
     width: number;
     height: number;
   };
+  /**
+   * Bake a circular mask into the delivered image (transparent corners).
+   * Forces f_png since alpha transparency is required. Used by getFavicon()
+   * so the browser-tab favicon actually renders round, not square.
+   * Pair with `crop: "square"` for a perfect circle.
+   */
+  circle?: boolean;
 };
 
 /**
@@ -86,6 +93,9 @@ export function cldUrl(publicId: string, opts: CldOptions = {}): string {
   const finalSegment: string[] = [];
   if (opts.removeBackground) {
     finalSegment.push("e_background_removal", "f_png");
+  } else if (opts.circle) {
+    // Circular mask requires alpha transparency; PNG is the safest target.
+    finalSegment.push("f_png");
   } else {
     finalSegment.push("f_auto");
   }
@@ -97,6 +107,9 @@ export function cldUrl(publicId: string, opts: CldOptions = {}): string {
   }
   if (opts.width) finalSegment.push(`w_${opts.width}`);
   if (opts.height) finalSegment.push(`h_${opts.height}`);
+  // r_max + transparent corners → circular delivery. Applied AFTER the
+  // aspect-ratio fill so the mask sits on the final framed pixel rect.
+  if (opts.circle) finalSegment.push("r_max");
   // Quality + retina:
   //  q_90      — explicit 90% quality (visually indistinguishable from
   //              original on photos, ~2-3× smaller than uncompressed).
