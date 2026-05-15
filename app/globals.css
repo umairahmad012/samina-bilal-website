@@ -539,3 +539,19 @@ button:hover svg,
 .section-y { padding-top: var(--section-y); padding-bottom: var(--section-y); }
 .section-y-lg { padding-top: var(--section-y-lg); padding-bottom: var(--section-y-lg); }
 .gutter-x { padding-left: var(--gutter-x); padding-right: var(--gutter-x); }
+
+/* Sticky parallax background — pins a full-bleed bg image while the
+   foreground scrolls. Respects the OS reduced-motion preference (a11y
+   signal) by falling back to scroll attachment for users who
+   have asked their device to minimize motion. */
+.bg-parallax {
+  background-attachment: fixed;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-parallax {
+    background-attachment: scroll;
+  }
+}
