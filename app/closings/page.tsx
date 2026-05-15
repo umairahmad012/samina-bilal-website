@@ -18,7 +18,7 @@ export default async function ClosingsPage() {
   const c = await getPageContent<ClosingsContent>("closings");
   const heroBg = await resolveImageUrl(c.hero.backgroundImage, {
     fallback:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&auto=format&fit=crop&q=85",
+      "/images/Light%20Exterior/Gemini_Generated_Image_uvsq4vuvsq4vuvsq.png",
     crop: "wide",
     width: 1920,
   });
@@ -28,7 +28,7 @@ export default async function ClosingsPage() {
       {/* HERO */}
       <section className="relative min-h-[70vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}

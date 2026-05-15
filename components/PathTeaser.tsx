@@ -14,7 +14,7 @@ export default async function PathTeaser() {
   const c = await getSection<PathTeaserContent>("home", "pathTeaser");
   const bgUrl = await resolveImageUrl(c.backgroundImage, {
     fallback:
-      "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85",
+      "/images/Light%20Sburban/Gemini_Generated_Image_dsi7y8dsi7y8dsi7.png",
     crop: "wide",
     width: 1920,
   });

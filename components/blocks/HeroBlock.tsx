@@ -55,11 +55,11 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
   const bgImage = w.backgroundImage
     ? await resolveImageUrl(w.backgroundImage, {
         fallback:
-          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2560&auto=format&fit=crop&q=85",
+          "/images/Light%20Exterior/Gemini_Generated_Image_io60ydio60ydio60.png",
         crop: "wide",
         width: 2560,
       })
-    : "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2560&auto=format&fit=crop&q=85";
+    : "/images/Light%20Exterior/Gemini_Generated_Image_io60ydio60ydio60.png";
 
   const titleLines = data.titleLines ?? [];
   const ctas = data.ctas ?? [];

@@ -25,13 +25,13 @@ export default async function ReviewsPage() {
   const [heroBg, ctaBg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen4.png",
       crop: "wide",
       width: 1920,
     }),
     resolveImageUrl(c.cta.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Sburban/Gemini_Generated_Image_dsi7y8dsi7y8dsi7.png",
       crop: "wide",
       width: 1920,
     }),
@@ -42,7 +42,7 @@ export default async function ReviewsPage() {
       {/* HERO */}
       <section className="relative min-h-[70vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}
@@ -115,7 +115,7 @@ export default async function ReviewsPage() {
       {/* CTA */}
       <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage: `url('${ctaBg}')`,
           }}

@@ -45,14 +45,14 @@ export default async function PartnersPage() {
   ]);
 
   const ctaFallbackBg =
-    "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/A.%20Light%20interior1.png";
   const darkBreakFallbackBg =
-    "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Sburban/Gemini_Generated_Image_z6i65ez6i65ez6i6.png";
 
   const [heroBg, ctaBg, darkBreakBg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Exterior/Gemini_Generated_Image_q79v04q79v04q79v.png",
       crop: "wide",
       width: 1920,
     }),
@@ -82,7 +82,7 @@ export default async function PartnersPage() {
       {/* HERO */}
       <section className="relative min-h-[70vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}
@@ -250,7 +250,7 @@ export default async function PartnersPage() {
       {/* CTA */}
       <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage: `url('${ctaBg}')`,
           }}

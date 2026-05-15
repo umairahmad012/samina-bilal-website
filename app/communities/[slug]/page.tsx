@@ -177,7 +177,7 @@ export default async function CommunityPage({
 
       {/* Dark break — separates "Life here" from "Samina's take" */}
       <DarkBreak
-        bgImage="https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85"
+        bgImage="/images/Light%20Exterior/Gemini_Generated_Image_fp3enofp3enofp3e.png"
         height="sm"
       />
 

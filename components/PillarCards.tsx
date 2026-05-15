@@ -18,9 +18,9 @@ type ServicesContent = {
 };
 
 const imageMap: Record<string, string> = {
-  buy: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1400&auto=format&fit=crop&q=85",
-  sell: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1400&auto=format&fit=crop&q=85",
-  path: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1400&auto=format&fit=crop&q=85",
+  buy: "/images/Light%20Exterior/Gemini_Generated_Image_fp3enofp3enofp3e.png",
+  sell: "/images/Light%20Sburban/Gemini_Generated_Image_2g305d2g305d2g30.png",
+  path: "/images/Light%20Sburban/Gemini_Generated_Image_cln91tcln91tcln9.png",
 };
 
 export default async function PillarCards() {

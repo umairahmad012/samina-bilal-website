@@ -27,13 +27,13 @@ export default async function CommunitiesPage() {
   const [heroBg, darkBreakBg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1572120360610-d971b9d7767c?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Sburban/Gemini_Generated_Image_2g305d2g305d2g30.png",
       crop: "wide",
       width: 1920,
     }),
     resolveImageUrl(c.darkBreak.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Sburban/Gemini_Generated_Image_cln91tcln91tcln9.png",
       crop: "wide",
       width: 1920,
     }),
@@ -51,7 +51,7 @@ export default async function CommunitiesPage() {
       {/* HERO — full-bleed dark photo, matches inner-page pattern */}
       <section className="relative min-h-[75vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}

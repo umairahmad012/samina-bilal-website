@@ -16,7 +16,7 @@ export default async function ReviewsStrip() {
   ]);
   const bgUrl = await resolveImageUrl(c.backgroundImage, {
     fallback:
-      "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1920&auto=format&fit=crop&q=85",
+      "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen2.png",
     crop: "wide",
     width: 1920,
   });
@@ -24,7 +24,7 @@ export default async function ReviewsStrip() {
     <section className="relative section-y-lg gutter-x overflow-hidden bg-cream-soft">
       {/* Subtle background photo */}
       <div
-        className="absolute inset-0 bg-cover bg-center opacity-[0.08]"
+        className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.08]"
         style={{
           backgroundImage: `url('${bgUrl}')`,
         }}

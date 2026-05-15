@@ -19,15 +19,13 @@ type DarkBreakContent = {
   attribution: string;
 };
 
-const DB1_FALLBACK_BG =
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85";
+const DB1_FALLBACK_BG = "/images/Light%20Interior/A.%20Light%20interior1.png";
 const DB1_DEFAULT_EYEBROW = "What Clients Say Most";
 const DB1_DEFAULT_QUOTE =
   "She makes the process feel calm — exactly what you want when you're making the biggest decision of your life.";
 const DB1_DEFAULT_ATTRIBUTION = "Repeat client · Google Review";
 
-const DB2_FALLBACK_BG =
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1920&auto=format&fit=crop&q=85";
+const DB2_FALLBACK_BG = "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen1.png";
 const DB2_DEFAULT_EYEBROW = "Why I Do This Work";
 const DB2_DEFAULT_QUOTE =
   "Real estate is the most important purchase most people make. It deserves a Realtor who treats it that way.";

@@ -53,9 +53,9 @@ export default async function AboutPage() {
   ]);
 
   const ctaFallbackBg =
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen3.png";
   const darkBreakFallbackBg =
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/A.%20Light%20interior2.png";
 
   const [ctaBg, darkBreakBg] = await Promise.all([
     resolveImageUrl(c.cta?.backgroundImage, {
@@ -206,7 +206,7 @@ export default async function AboutPage() {
       {/* CTA */}
       <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage: `url('${ctaBg}')`,
           }}

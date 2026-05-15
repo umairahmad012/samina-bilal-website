@@ -42,7 +42,7 @@ export default async function ContactPage() {
   };
   const heroBg = await resolveImageUrl(c.hero.backgroundImage, {
     fallback:
-      "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85",
+      "/images/Light%20Exterior/Gemini_Generated_Image_end3jcend3jcend3.png",
     crop: "wide",
     width: 1920,
   });
@@ -51,7 +51,7 @@ export default async function ContactPage() {
       {/* HERO */}
       <section className="relative min-h-[60vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}

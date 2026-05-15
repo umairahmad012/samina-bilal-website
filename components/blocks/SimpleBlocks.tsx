@@ -217,11 +217,11 @@ export async function DarkBreakBlock({ data }: { data: DarkBreakData }) {
   const bg = w.backgroundImage
     ? await resolveImageUrl(w.backgroundImage, {
         fallback:
-          "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2560&auto=format&fit=crop&q=85",
+          "/images/Light%20Exterior/Gemini_Generated_Image_q79v04q79v04q79v.png",
         crop: "wide",
         width: 2560,
       })
-    : "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=2560&auto=format&fit=crop&q=85";
+    : "/images/Light%20Exterior/Gemini_Generated_Image_q79v04q79v04q79v.png";
 
   // YouTube background variant — fall through to DarkBreak for image; for
   // video we render an inline iframe with the same quote overlay.

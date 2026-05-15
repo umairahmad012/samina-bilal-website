@@ -17,10 +17,10 @@ export const dynamic = "force-dynamic";
 // renders these Unsplash URLs. The registry's `path.stepImages` section
 // lets Samina swap each one independently.
 const stepImageFallbacks = [
-  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1920&auto=format&fit=crop&q=85",
-  "https://images.unsplash.com/photo-1554224154-26032ffc0d07?w=1920&auto=format&fit=crop&q=85",
-  "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85",
-  "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85",
+  "/images/Light%20Interior/A.%20Light%20interior5.png",
+  "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen1.png",
+  "/images/Light%20Exterior/Gemini_Generated_Image_me0zvtme0zvtme0z.png",
+  "/images/Light%20Exterior/Gemini_Generated_Image_mwf53omwf53omwf5.png",
 ];
 
 type PathContent = {
@@ -65,14 +65,14 @@ export default async function PathPage() {
   ]);
 
   const ctaFallbackBg =
-    "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen2.png";
   const darkBreakFallbackBg =
-    "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Exterior/Gemini_Generated_Image_oibh09oibh09oibh.png";
 
   const [heroBg, ctaBg, darkBreakBg, ...stepImages] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1582407947304-fd86f028f716?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Sburban/Gemini_Generated_Image_j0eufqj0eufqj0eu.png",
       crop: "wide",
       width: 1920,
     }),
@@ -123,7 +123,7 @@ export default async function PathPage() {
       {/* HERO */}
       <section className="relative min-h-[85vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}
@@ -191,7 +191,7 @@ export default async function PathPage() {
             className="relative w-full h-full overflow-hidden bg-navy-dark"
           >
             <div
-              className="absolute inset-0 bg-cover bg-center"
+              className="absolute inset-0 bg-cover bg-center bg-parallax"
               style={{
                 backgroundImage: `url('${stepImages[i % stepImages.length]}')`,
               }}
@@ -316,7 +316,7 @@ export default async function PathPage() {
       {/* CTA */}
       <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage: `url('${ctaBg}')`,
           }}

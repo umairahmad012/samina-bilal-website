@@ -20,10 +20,10 @@ export default function PrivacyPage() {
       {/* HERO — matches inner-page pattern */}
       <section className="relative min-h-[55vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=1920&auto=format&fit=crop&q=85')",
+              "url('/images/Light%20Sburban/Gemini_Generated_Image_hvi90qhvi90qhvi9.png')",
           }}
         />
         <div className="absolute inset-0 overlay-hero" />

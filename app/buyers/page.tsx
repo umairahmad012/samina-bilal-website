@@ -91,14 +91,14 @@ export default async function BuyersPage() {
   ]);
 
   const ctaFallbackBg =
-    "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/A.%20Light%20interior3.png";
   const darkBreakFallbackBg =
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85";
+    "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen4.png";
 
   const [heroBg, ctaBg, darkBreakBg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
-        "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=1920&auto=format&fit=crop&q=85",
+        "/images/Light%20Exterior/Gemini_Generated_Image_j7jh1qj7jh1qj7jh.png",
       crop: "wide",
       width: 1920,
     }),
@@ -138,7 +138,7 @@ export default async function BuyersPage() {
       {/* HERO */}
       <section className="relative min-h-[85vh] w-full overflow-hidden bg-navy-dark">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 bg-cover bg-center bg-parallax"
           style={{
             backgroundImage: `url('${heroBg}')`,
           }}
@@ -277,10 +277,10 @@ export default async function BuyersPage() {
       {/* First-time buyer spotlight — links to Path to Ownership */}
       <section className="relative bg-navy text-white section-y-lg gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage:
-              "url('https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1920&auto=format&fit=crop&q=85')",
+              "url('/images/Light%20Sburban/Gemini_Generated_Image_j0eufqj0eufqj0eu.png')",
           }}
         />
         <div className="relative max-w-3xl mx-auto text-center">
@@ -350,7 +350,7 @@ export default async function BuyersPage() {
       {/* Final CTA */}
       <section className="relative bg-navy text-white section-y gutter-x overflow-hidden">
         <div
-          className="absolute inset-0 bg-cover bg-center opacity-[0.18]"
+          className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
             backgroundImage: `url('${ctaBg}')`,
           }}

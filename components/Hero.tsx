@@ -31,7 +31,7 @@ type HeroContent = {
 const FALLBACK_VIDEO_MP4 =
   "https://res.cloudinary.com/dgkg1aozt/video/upload/v1/samples/sea-turtle.mp4";
 const FALLBACK_POSTER =
-  "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85";
+  "/images/Light%20Exterior/Gemini_Generated_Image_end3jcend3jcend3.png";
 
 function toNumber(v: unknown): number {
   if (typeof v === "number") return v;

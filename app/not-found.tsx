@@ -8,7 +8,7 @@ export default function NotFound() {
         className="absolute inset-0 bg-cover bg-center bg-parallax"
         style={{
           backgroundImage:
-            "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&auto=format&fit=crop&q=85')",
+            "url('/images/Light%20Interior/Light%20interior%20%2B%20Kitchen3.png')",
         }}
       />
       <div className="absolute inset-0 overlay-hero" />
