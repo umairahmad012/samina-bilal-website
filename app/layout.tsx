@@ -9,6 +9,7 @@ import PageTransitionLoader from "@/components/PageTransitionLoader";
 import { getPortrait, getFeaturedImage } from "@/lib/contentLoader";
 import { getAnalyticsMeasurementId } from "@/lib/integrationStore";
 import { siteOrigin } from "@/lib/qrcode";
+import { getSiteSettings } from "@/lib/siteSettings";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -60,9 +61,10 @@ export default async function RootLayout({
   // don't each re-fetch. When admin pastes a GA Measurement ID via
   // /admin/integrations/analytics, this becomes a string like "G-XXXX...";
   // when blank or disabled, GA scripts simply don't render.
-  const [portrait, gaMeasurementId] = await Promise.all([
+  const [portrait, gaMeasurementId, settings] = await Promise.all([
     getPortrait(),
     getAnalyticsMeasurementId(),
+    getSiteSettings(),
   ]);
 
   return (
@@ -96,7 +98,7 @@ export default async function RootLayout({
         <PageTransitionLoader />
         <Header portraitAvatar={portrait.avatar} />
         <main>{children}</main>
-        <Footer portraitAvatar={portrait.avatar} />
+        <Footer portraitAvatar={portrait.avatar} settings={settings} />
       </body>
     </html>
   );

@@ -3,14 +3,36 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Instagram, Facebook, Music2 } from "lucide-react";
-import { site } from "@/lib/site";
+import { site as staticSite } from "@/lib/site";
+import type { SiteSettings } from "@/lib/siteSettings";
 
 export default function Footer({
   portraitAvatar,
+  settings,
 }: {
   portraitAvatar?: string;
+  /** Admin-edited site settings (from Site Settings form). When
+   *  absent, falls back to compile-time lib/site.ts defaults. */
+  settings?: SiteSettings;
 }) {
   const pathname = usePathname();
+
+  // Prefer admin-edited settings; fall back to compile-time defaults.
+  // Every field the markup reads has a fallback chain so a partially-
+  // populated row never renders empty.
+  const site = {
+    phone: settings?.phone || staticSite.phone,
+    phoneHref: settings?.phoneHref || staticSite.phoneHref,
+    email: settings?.email || staticSite.email,
+    emailHref: settings?.emailHref || staticSite.emailHref,
+    brokerageOffice: settings?.brokerageOffice ?? staticSite.brokerageOffice,
+    portrait: settings?.portrait ?? staticSite.portrait,
+    social: {
+      instagram: settings?.social.instagram || staticSite.social.instagram,
+      facebook: settings?.social.facebook || staticSite.social.facebook,
+      tiktok: settings?.social.tiktok || staticSite.social.tiktok,
+    },
+  };
   const bo = site.brokerageOffice;
   const avatar = portraitAvatar || site.portrait.avatar;
 
