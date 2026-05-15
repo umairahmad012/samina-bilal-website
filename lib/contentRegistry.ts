@@ -683,6 +683,12 @@ export const SECTIONS: SectionDef[] = [
       heading: { type: "text", label: "Heading" },
       body: { type: "paragraph", label: "Body", rows: 4 },
       cta: { type: "object", label: "Button", shape: ctaShape },
+      backgroundImage: {
+        type: "image",
+        label: "Background Image",
+        crop: "wide",
+        help: "Full-bleed background behind the callout band.",
+      },
     },
   },
   {

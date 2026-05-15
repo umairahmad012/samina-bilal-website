@@ -52,6 +52,7 @@ type BuyersContent = {
     heading: string;
     body: string;
     cta: { label: string; href: string };
+    backgroundImage?: { image_id?: string };
   };
   cta: {
     heading: string;
@@ -95,7 +96,7 @@ export default async function BuyersPage() {
   const darkBreakFallbackBg =
     "/images/Light%20Interior/Light%20interior%20%2B%20Kitchen4.png";
 
-  const [heroBg, ctaBg, darkBreakBg] = await Promise.all([
+  const [heroBg, ctaBg, darkBreakBg, firstTimeBg] = await Promise.all([
     resolveImageUrl(c.hero.backgroundImage, {
       fallback:
         "/images/Light%20Exterior/Gemini_Generated_Image_j7jh1qj7jh1qj7jh.png",
@@ -109,6 +110,12 @@ export default async function BuyersPage() {
     }),
     resolveImageUrl(darkBreak?.backgroundImage, {
       fallback: darkBreakFallbackBg,
+      crop: "wide",
+      width: 1920,
+    }),
+    resolveImageUrl(c.firstTimeCallout?.backgroundImage, {
+      fallback:
+        "/images/Light%20Sburban/Gemini_Generated_Image_j0eufqj0eufqj0eu.png",
       crop: "wide",
       width: 1920,
     }),
@@ -279,8 +286,7 @@ export default async function BuyersPage() {
         <div
           className="absolute inset-0 bg-cover bg-center bg-parallax opacity-[0.18]"
           style={{
-            backgroundImage:
-              "url('/images/Light%20Sburban/Gemini_Generated_Image_j0eufqj0eufqj0eu.png')",
+            backgroundImage: `url('${firstTimeBg}')`,
           }}
         />
         <div className="relative max-w-3xl mx-auto text-center">
