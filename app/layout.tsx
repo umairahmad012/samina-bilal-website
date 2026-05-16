@@ -10,7 +10,7 @@ import ParallaxScroll from "@/components/ParallaxScroll";
 import { getPortrait, getFeaturedImage } from "@/lib/contentLoader";
 import { getAnalyticsMeasurementId } from "@/lib/integrationStore";
 import { siteOrigin } from "@/lib/qrcode";
-import { getSiteSettings, FIXED_NAV_HREF } from "@/lib/siteSettings";
+import { getSiteSettings, FIXED_NAV_HREF, getPageMeta } from "@/lib/siteSettings";
 import { getNavPages } from "@/lib/customPages";
 
 const montserrat = Montserrat({
@@ -29,26 +29,39 @@ const montserrat = Montserrat({
  * specific fields like `openGraph.images` per page.
  */
 export async function generateMetadata(): Promise<Metadata> {
-  const ogImage = await getFeaturedImage();
+  const [ogImage, homeMeta] = await Promise.all([
+    getFeaturedImage(),
+    getPageMeta("home"),
+  ]);
+  // Hardcoded strings preserved as fallback so behavior is identical when
+  // page_meta('home') is empty. Once admin edits the home title in
+  // /admin/seo, those values automatically replace these defaults — no
+  // code change needed.
+  const fallbackTitle =
+    "Samina Bilal | Northern Virginia & Maryland Real Estate";
+  const fallbackDescription =
+    "Make yourself at home. Samina Bilal is a licensed Realtor with RE/MAX Galaxy serving Virginia and Maryland — Woodbridge, Stafford, Lorton, Ashburn, Manassas, Dumfries.";
+  const fallbackOgDescription =
+    "Make yourself at home. Boutique real estate representation across Virginia and Maryland.";
+  const title = homeMeta?.title || fallbackTitle;
+  const description = homeMeta?.description || fallbackDescription;
+  const ogDescription = homeMeta?.description || fallbackOgDescription;
   return {
     metadataBase: new URL(siteOrigin()),
-    title: "Samina Bilal | Northern Virginia & Maryland Real Estate",
-    description:
-      "Make yourself at home. Samina Bilal is a licensed Realtor with RE/MAX Galaxy serving Virginia and Maryland — Woodbridge, Stafford, Lorton, Ashburn, Manassas, Dumfries.",
+    title,
+    description,
     // Favicon is generated dynamically by `app/icon.tsx` (round PNG with
     // transparent corners). Next auto-discovers it; no manual entry needed.
     openGraph: {
-      title: "Samina Bilal | Northern Virginia & Maryland Real Estate",
-      description:
-        "Make yourself at home. Boutique real estate representation across Virginia and Maryland.",
+      title,
+      description: ogDescription,
       type: "website",
       images: [{ url: ogImage }],
     },
     twitter: {
       card: "summary_large_image",
-      title: "Samina Bilal | Northern Virginia & Maryland Real Estate",
-      description:
-        "Make yourself at home. Boutique real estate representation across Virginia and Maryland.",
+      title,
+      description: ogDescription,
       images: [ogImage],
     },
   };
