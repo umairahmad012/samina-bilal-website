@@ -57,7 +57,7 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
         fallback:
           "/images/Light%20Exterior/Gemini_Generated_Image_io60ydio60ydio60.png",
         crop: "wide",
-        width: 2560,
+        width: 3840,
       })
     : "/images/Light%20Exterior/Gemini_Generated_Image_io60ydio60ydio60.png";
 

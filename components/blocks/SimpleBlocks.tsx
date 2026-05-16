@@ -219,7 +219,7 @@ export async function DarkBreakBlock({ data }: { data: DarkBreakData }) {
         fallback:
           "/images/Light%20Exterior/Gemini_Generated_Image_q79v04q79v04q79v.png",
         crop: "wide",
-        width: 2560,
+        width: 3840,
       })
     : "/images/Light%20Exterior/Gemini_Generated_Image_q79v04q79v04q79v.png";
 
@@ -302,7 +302,7 @@ export async function CtaBandBlock({ data }: { data: CtaBandData }) {
     ? await resolveImageUrl(w.backgroundImage, {
         fallback: "",
         crop: "wide",
-        width: 2560,
+        width: 3840,
       })
     : "";
 
