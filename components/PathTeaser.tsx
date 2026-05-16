@@ -16,7 +16,7 @@ export default async function PathTeaser() {
     fallback:
       "/images/Light%20Sburban/Gemini_Generated_Image_dsi7y8dsi7y8dsi7.png",
     crop: "wide",
-    width: 1920,
+    width: 3840,
   });
 
   return (
