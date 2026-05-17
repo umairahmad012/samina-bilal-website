@@ -149,7 +149,7 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
                     key={i}
                     href={cta.href}
                     className={
-                      cta.style === "outline" ? "btn-glass-outline" : "btn-glass"
+                      cta.style === "outline" ? "btn-outline-light" : "btn-glass"
                     }
                   >
                     {cta.label}
