@@ -3,7 +3,6 @@ import AdminShell from "@/components/admin/AdminShell";
 import AdminLoginForm from "@/components/admin/AdminLoginForm";
 import AdminCard from "@/components/admin/AdminCard";
 import {
-  FileText,
   Layers,
   LayoutTemplate,
   SlidersHorizontal,
@@ -72,15 +71,6 @@ const editorSections: Array<{
       "Phone, email, social URLs, licenses, header navigation, and per-page SEO metadata.",
     accent: "#3e6b3e",
     badge: "Settings",
-    variant: "lines",
-  },
-  {
-    href: "/admin/content",
-    icon: FileText,
-    title: "Content (legacy)",
-    description: "Original per-section editor. Page Builder is the new way; this is kept for any sections not yet migrated.",
-    accent: "#5b7c4a",
-    badge: "Copy",
     variant: "lines",
   },
   {
