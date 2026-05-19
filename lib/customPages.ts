@@ -32,7 +32,7 @@ export const RESERVED_SLUGS: ReadonlyArray<string> = [
   "about",
   "buyers",
   "sellers",
-  "invest",
+  "path-to-ownership",
   "communities",
   "closings",
   "reviews",

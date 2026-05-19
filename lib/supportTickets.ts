@@ -28,7 +28,7 @@ export const SUPPORT_PAGES = [
   { value: "about", label: "About (/about)" },
   { value: "buyers", label: "Buyers (/buyers)" },
   { value: "sellers", label: "Sellers (/sellers)" },
-  { value: "invest", label: "Invest (/invest)" },
+  { value: "path-to-ownership", label: "Path to Ownership (/path-to-ownership)" },
   { value: "communities", label: "Communities (/communities)" },
   { value: "closings", label: "Recent Closings (/closings)" },
   { value: "reviews", label: "Reviews (/reviews)" },

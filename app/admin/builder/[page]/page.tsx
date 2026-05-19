@@ -28,7 +28,7 @@ const FIXED_PAGES: Array<{ key: string; label: string; livePath: string }> = [
   { key: "about", label: "About", livePath: "/about" },
   { key: "buyers", label: "Buyers", livePath: "/buyers" },
   { key: "sellers", label: "Sellers", livePath: "/sellers" },
-  { key: "invest", label: "Invest", livePath: "/invest" },
+  { key: "path-to-ownership", label: "Path to Ownership", livePath: "/path-to-ownership" },
   { key: "communities", label: "Communities (Index)", livePath: "/communities" },
   { key: "closings", label: "Recent Closings", livePath: "/closings" },
   { key: "reviews", label: "Reviews", livePath: "/reviews" },

@@ -28,7 +28,7 @@ const PAGES: Array<{ key: string; label: string; href: string }> = [
   { key: "about", label: "About", href: "/about" },
   { key: "buyers", label: "Buyers", href: "/buyers" },
   { key: "sellers", label: "Sellers", href: "/sellers" },
-  { key: "invest", label: "Invest", href: "/invest" },
+  { key: "path-to-ownership", label: "Path to Ownership", href: "/path-to-ownership" },
   { key: "communities", label: "Communities", href: "/communities" },
   { key: "closings", label: "Recent Closings", href: "/closings" },
   { key: "partners", label: "Trusted Partners", href: "/partners" },
