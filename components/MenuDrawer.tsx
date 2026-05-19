@@ -35,16 +35,11 @@ export default function MenuDrawer({
     href: string;
     children?: { label: string; href: string }[];
   };
+  // Strip any nested children — drawer renders a flat list only.
   const baseNav: NavItem[] =
     fixedNavItems && fixedNavItems.length > 0
-      ? // Re-attach Communities sub-children when present in the original nav
-        fixedNavItems.map((item) => {
-          const orig = (nav as NavItem[]).find((n) => n.href === item.href);
-          return orig?.children
-            ? { ...item, children: orig.children }
-            : item;
-        })
-      : (nav as NavItem[]);
+      ? fixedNavItems.map((item) => ({ label: item.label, href: item.href }))
+      : (nav as NavItem[]).map(({ label, href }) => ({ label, href }));
 
   const mergedNav: NavItem[] = (() => {
     if (!extraNavItems || extraNavItems.length === 0) return baseNav;
