@@ -59,10 +59,13 @@ export default function PageTransitionLoader() {
   const hideAt = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   // First-load (once per page-session). Mounts a 2-second timer
-  // unless we're inside /admin.
+  // unless we're inside /admin OR on the homepage (Samina prefers
+  // the marketing landing page to render instantly without the
+  // gold overlay flashing on top of the hero).
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (window.location.pathname.startsWith("/admin")) return;
+    if (window.location.pathname === "/") return;
     if (firstLoadFired) return;
     firstLoadFired = true;
     setActiveHideAt(Date.now() + FIRST_LOAD_MS);
@@ -111,6 +114,14 @@ export default function PageTransitionLoader() {
         window.location.pathname.startsWith("/admin")
       ) {
         return true;
+      }
+      // Skip the overlay when navigating TO the homepage — it should
+      // feel instant arriving at the landing page.
+      try {
+        const targetPath = new URL(href, window.location.origin).pathname;
+        if (targetPath === "/") return true;
+      } catch {
+        if (href === "/" || href === "") return true;
       }
       return false;
     }
