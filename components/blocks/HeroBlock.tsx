@@ -66,7 +66,7 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
   const stats = data.stats ?? [];
 
   return (
-    <section className={`relative w-full min-h-screen overflow-hidden bg-navy-dark ${textClass}`}>
+    <section className={`relative w-full min-h-[80vh] md:min-h-screen overflow-hidden bg-navy-dark ${textClass}`}>
       {/* Background */}
       <div className="absolute inset-0">
         {ytId ? (
@@ -83,7 +83,7 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
           </div>
         ) : (
           <div
-            className="absolute inset-0 bg-cover bg-center bg-parallax"
+            className="absolute inset-0 hero-bg-fit-mobile bg-cover bg-center bg-parallax"
             style={{ backgroundImage: `url('${bgImage}')` }}
           />
         )}
@@ -91,7 +91,7 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
       </div>
 
       {/* Content */}
-      <div className="relative z-10 min-h-screen flex flex-col">
+      <div className="relative z-10 min-h-[80vh] md:min-h-screen flex flex-col">
         <div className="flex-1 flex flex-col items-center justify-center text-center px-6 sm:px-8 pt-28 md:pt-32 pb-10 md:pb-12">
           {data.eyebrow ? (
             <p

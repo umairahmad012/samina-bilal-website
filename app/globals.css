@@ -709,6 +709,22 @@ button:hover svg,
     background-attachment: scroll;
   }
 }
+
+/* ============================================================
+   HERO BG — fit-whole-image on mobile
+   ============================================================
+   The Cloudinary source for the hero is 16:9 wide. On portrait
+   phones, `cover` crops the sides aggressively and shows only a
+   slice of the image. On mobile breakpoints (≤767px) switch to
+   `contain` anchored to the top so the WHOLE photo is visible.
+   Desktop keeps the dramatic full-bleed cover. */
+@media (max-width: 767px) {
+  .hero-bg-fit-mobile {
+    background-size: contain !important;
+    background-position: center top !important;
+  }
+}
+
 /* ============================================================
    PER-FIELD TEXT-COLOR FORCERS
    ============================================================
