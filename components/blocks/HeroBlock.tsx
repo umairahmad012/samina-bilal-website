@@ -87,6 +87,21 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
             style={{ backgroundImage: `url('${bgImage}')` }}
           />
         )}
+        {/* Mobile only — soft fade where the contain'd image ends so the
+            transition into the navy section is blurred, not a hard edge.
+            Image is 16:9 contain'd at top, so its bottom sits at 56.25vw
+            from the top of the section. The strip below straddles that
+            edge with a transparent→navy gradient. */}
+        <div
+          className="md:hidden absolute inset-x-0 pointer-events-none"
+          style={{
+            top: "calc(56.25vw - 5rem)",
+            height: "10rem",
+            background:
+              "linear-gradient(to bottom, transparent 0%, rgb(var(--brand-primary-dark-rgb, 14 28 48)) 75%)",
+          }}
+          aria-hidden="true"
+        />
         <div className="absolute inset-0 overlay-hero" />
       </div>
 
