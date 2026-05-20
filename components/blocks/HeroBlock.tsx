@@ -95,10 +95,13 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
         <div
           className="md:hidden absolute inset-x-0 pointer-events-none"
           style={{
-            top: "calc(56.25vw - 5rem)",
-            height: "10rem",
+            // Strip extends well below the image edge so the fade has
+            // plenty of room on the navy side — softer dissolve, no
+            // visible hand-off point.
+            top: "calc(56.25vw - 4rem)",
+            height: "18rem",
             background:
-              "linear-gradient(to bottom, transparent 0%, rgb(var(--brand-primary-dark-rgb, 14 28 48)) 75%)",
+              "linear-gradient(to bottom, transparent 0%, rgba(var(--brand-primary-dark-rgb, 14 28 48), 0.6) 45%, rgb(var(--brand-primary-dark-rgb, 14 28 48)) 100%)",
           }}
           aria-hidden="true"
         />
