@@ -65,30 +65,43 @@ export default async function Hero() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-navy-dark">
-      {/* Video / image layer — YouTube iframe if a video was picked,
-           otherwise the default mp4 (sea turtle) with the poster image. */}
+      {/* Video / image layer — on phones we always show the poster image
+           (no video, even if one is set in the CMS). On md+ we use the
+           YouTube iframe if a video was picked, otherwise the default mp4
+           with the poster image. */}
       <div className="absolute inset-0">
-        {video.kind === "youtube" ? (
-          <iframe
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
-            src={video.embedUrl}
-            title="Hero background video"
-            allow="autoplay; encrypted-media"
-            allowFullScreen={false}
-            frameBorder="0"
-          />
-        ) : (
-          <video
-            className="w-full h-full object-cover"
-            autoPlay
-            loop
-            muted
-            playsInline
-            poster={posterUrl}
-          >
-            <source src={FALLBACK_VIDEO_MP4} type="video/mp4" />
-          </video>
-        )}
+        {/* Mobile: image only */}
+        <img
+          src={posterUrl}
+          alt=""
+          aria-hidden="true"
+          className="md:hidden absolute inset-0 w-full h-full object-contain bg-navy-dark"
+        />
+
+        {/* md+ : video or iframe */}
+        <div className="hidden md:block absolute inset-0">
+          {video.kind === "youtube" ? (
+            <iframe
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full pointer-events-none"
+              src={video.embedUrl}
+              title="Hero background video"
+              allow="autoplay; encrypted-media"
+              allowFullScreen={false}
+              frameBorder="0"
+            />
+          ) : (
+            <video
+              className="w-full h-full object-cover"
+              autoPlay
+              loop
+              muted
+              playsInline
+              poster={posterUrl}
+            >
+              <source src={FALLBACK_VIDEO_MP4} type="video/mp4" />
+            </video>
+          )}
+        </div>
         <div className="absolute inset-0 overlay-hero" />
       </div>
 
