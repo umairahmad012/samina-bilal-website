@@ -98,12 +98,12 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
               src={bgImage}
               alt=""
               aria-hidden="true"
-              className="md:hidden absolute inset-x-0 top-0 w-full h-auto select-none"
+              className="md:hidden absolute inset-x-0 top-0 w-full h-[58vh] object-cover object-top select-none"
               style={{
                 maskImage:
-                  "linear-gradient(to bottom, black 0%, black 55%, transparent 100%)",
+                  "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
                 WebkitMaskImage:
-                  "linear-gradient(to bottom, black 0%, black 55%, transparent 100%)",
+                  "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
               }}
             />
           </>
