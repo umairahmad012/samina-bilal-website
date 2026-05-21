@@ -70,12 +70,23 @@ export default async function Hero() {
            YouTube iframe if a video was picked, otherwise the default mp4
            with the poster image. */}
       <div className="absolute inset-0">
-        {/* Mobile: image only */}
+        {/* Mobile: image only. Anchored to top of section, scaled to fill
+             via object-cover so the architecture stays in frame (landscaping
+             at the bottom of the source crops off). Image occupies the top
+             58vh, then a mask-image fade dissolves the bottom ~32% of the
+             image into the navy section just below the headline. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={posterUrl}
           alt=""
           aria-hidden="true"
-          className="md:hidden absolute inset-0 w-full h-full object-contain bg-navy-dark"
+          className="md:hidden absolute inset-x-0 top-0 w-full h-[58vh] object-cover object-top select-none"
+          style={{
+            maskImage:
+              "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 0%, black 68%, transparent 100%)",
+          }}
         />
 
         {/* md+ : video or iframe */}
