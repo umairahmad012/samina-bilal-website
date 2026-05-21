@@ -82,29 +82,32 @@ export default async function HeroBlock({ data }: { data: HeroData }) {
             />
           </div>
         ) : (
-          <div
-            className="absolute inset-0 hero-bg-fit-mobile bg-cover bg-center bg-parallax"
-            style={{ backgroundImage: `url('${bgImage}')` }}
-          />
+          <>
+            {/* Desktop: full-bleed bg with cover + parallax */}
+            <div
+              className="hidden md:block absolute inset-0 bg-cover bg-center bg-parallax"
+              style={{ backgroundImage: `url('${bgImage}')` }}
+            />
+            {/* Mobile: real <img> with object-contain so the whole
+                picture is visible, plus a mask-image fade so the
+                bottom ~35% of the IMAGE itself dissolves into the
+                navy section. Mask is relative to the image, not the
+                viewport, so it always looks right on any phone. */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={bgImage}
+              alt=""
+              aria-hidden="true"
+              className="md:hidden absolute inset-x-0 top-0 w-full h-auto select-none"
+              style={{
+                maskImage:
+                  "linear-gradient(to bottom, black 0%, black 55%, transparent 100%)",
+                WebkitMaskImage:
+                  "linear-gradient(to bottom, black 0%, black 55%, transparent 100%)",
+              }}
+            />
+          </>
         )}
-        {/* Mobile only — soft fade where the contain'd image ends so the
-            transition into the navy section is blurred, not a hard edge.
-            Image is 16:9 contain'd at top, so its bottom sits at 56.25vw
-            from the top of the section. The strip below straddles that
-            edge with a transparent→navy gradient. */}
-        <div
-          className="md:hidden absolute inset-x-0 pointer-events-none"
-          style={{
-            // Strip extends well below the image edge so the fade has
-            // plenty of room on the navy side — softer dissolve, no
-            // visible hand-off point.
-            top: "calc(56.25vw - 4rem)",
-            height: "18rem",
-            background:
-              "linear-gradient(to bottom, transparent 0%, rgba(var(--brand-primary-dark-rgb, 14 28 48), 0.6) 45%, rgb(var(--brand-primary-dark-rgb, 14 28 48)) 100%)",
-          }}
-          aria-hidden="true"
-        />
         <div className="absolute inset-0 overlay-hero" />
       </div>
 
