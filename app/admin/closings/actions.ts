@@ -28,18 +28,36 @@ export async function createClosing(input: ClosingInput): Promise<Result> {
   const { supabase, user } = await requireUser();
   if (!user) return { ok: false, error: "Not signed in." };
 
-  // Append at end of order
-  const { data: existing } = await supabase
+  // Prepend at TOP — the newest closing should appear first on the
+  // homepage gallery (which slices items[0..5]) and at the start of
+  // the /closings page. We shift every existing row's display_order
+  // down by 1, then insert the new row at display_order = 0.
+  // Admin can still fine-tune the order with the up/down arrows.
+  const { data: all } = await supabase
     .from("closings")
-    .select("display_order")
-    .order("display_order", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  const nextOrder = (existing?.display_order ?? -1) + 1;
+    .select("id, display_order")
+    .order("display_order", { ascending: true });
+
+  if (all && all.length > 0) {
+    // Update in DESC order to avoid unique-index collisions if one
+    // is ever added later. Currently there's no UNIQUE on
+    // display_order, but this is safe regardless.
+    const shifts = [...all]
+      .sort((a, b) => b.display_order - a.display_order)
+      .map((c) =>
+        supabase
+          .from("closings")
+          .update({ display_order: c.display_order + 1 })
+          .eq("id", c.id),
+      );
+    const results = await Promise.all(shifts);
+    const firstErr = results.find((r) => r.error);
+    if (firstErr?.error) return { ok: false, error: firstErr.error.message };
+  }
 
   const { error } = await supabase
     .from("closings")
-    .insert({ ...input, display_order: nextOrder });
+    .insert({ ...input, display_order: 0 });
   if (error) return { ok: false, error: error.message };
 
   revalidatePath("/admin/closings");

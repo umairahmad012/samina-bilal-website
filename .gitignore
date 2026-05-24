@@ -50,3 +50,6 @@ Thumbs.db
 .netlify
 supabase/.temp/
 scripts/.bg-image-uuids.json
+
+# Source archive — regenerated on every Netlify build by `npm run bundle:files`
+public/files/

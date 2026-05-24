@@ -1,5 +1,8 @@
 [build]
-  command = "npm run build"
+  # Generate the /admin/files source archive at build-time, then build the
+  # Next.js app. The archive lives under public/files/ and is served as
+  # static assets from the Next.js publish output.
+  command = "npm run bundle:files && npm run build"
   publish = ".next"
 
 [[plugins]]

@@ -6,7 +6,8 @@
     "dev": "next dev -p 3008",
     "build": "next build",
     "start": "next start -p 3008",
-    "lint": "next lint"
+    "lint": "next lint",
+    "bundle:files": "npx --yes tsx@4 scripts/buildFileBundle.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.3",
